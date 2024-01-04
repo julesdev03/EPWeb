@@ -1,0 +1,127 @@
+body {
+    margin: 0;
+}
+
+canvas {
+    border: solid grey 2px;
+    background-color: white;
+    width: 700px;
+    height: 366px;
+}
+
+@media (max-width: 768px) {
+    canvas {
+      width: 600px; /* Full width on smaller screens */
+      height: 314px; /* Auto height to maintain aspect ratio */
+    }
+}
+
+@media (max-width: 600px) {
+    canvas {
+      width: 500px; /* Full width on smaller screens */
+      height: 261px; /* Auto height to maintain aspect ratio */
+    }
+}
+
+@media (max-width: 500px) {
+    canvas {
+      width: 400px; /* Full width on smaller screens */
+      height: 209px; /* Auto height to maintain aspect ratio */
+    }
+}
+
+@media (max-width: 400px) {
+    canvas {
+      width: 300px; /* Full width on smaller screens */
+      height: 157px; /* Auto height to maintain aspect ratio */
+    }
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    min-width: 100vw;
+    min-height: 100vh;
+    margin-bottom: 3rem;
+}
+
+#date-div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+
+input {
+    width: 80%;
+    max-width: 35rem;
+    padding: .4rem;
+}
+
+select {
+    width: 80vw;
+    max-width: 40rem;
+    padding: .4rem;
+}
+
+#zoneDrop {
+    width: 80%;
+    max-width: 35rem;
+    height: 40vh;
+    max-height: 60rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: solid grey 3px;
+}
+
+#additional-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    min-height: 100%;
+}
+
+.divSmallContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: .7rem;
+    justify-content: center;
+}
+
+.dateInput {
+    display: flex;
+    flex-direction: row;
+    /* justify-content: center; */
+    align-items: center;
+    width: 80%;
+    max-width: 35rem;
+    border: solid grey 1.5px;
+}
+
+.dateInput:focus-within {
+    border: solid red 1px;
+}
+
+.dateInput > input, .dateInput p {
+    border: none;
+    padding: none;
+    padding: 0;
+    margin: 0;
+    margin-right: 0.3rem;
+}
+
+.dateInput input {
+    width: 3ch;
+    text-align: right;
+    outline: none;
+}

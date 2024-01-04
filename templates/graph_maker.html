@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EP Graph maker</title>
+
+    <link rel="stylesheet" href="{{url_for('static', filename='graph_maker.css')}}">
+</head>
+<body>
+    <div id="container">
+        <h1>EP GRAPH MAKER</h1>
+        <div id="date-div">
+            <label>Select a date</label>
+            <div class="dateInput">
+                <input type="text" id="day" value="DD">
+                <p>/</p>
+                <input type="text" id="month" value="MM">
+                <p>/</p>
+                <input type="text" id="year" value="YYYY">
+            </div>
+        </div>
+        <div id="additional-div">
+        </div>
+    </div>
+
+</body>
+<script src="{{url_for('static', filename='graph_maker.js')}}"></script>
+</html>
