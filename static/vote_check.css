@@ -1,0 +1,173 @@
+body {
+    margin: 0;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    min-width: 100vw;
+    max-width: 100vw;
+    min-height: 100vh;
+}
+
+#date-div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+
+input {
+    width: 80%;
+    max-width: 35rem;
+    padding: .4rem;
+}
+
+select {
+    width: 80vw;
+    max-width: 40rem;
+    padding: .4rem;
+}
+
+#additional-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    min-height: 100%;
+}
+
+.divSmallContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: .7rem;
+    justify-content: center;
+}
+
+.dateInput {
+    display: flex;
+    flex-direction: row;
+    /* justify-content: center; */
+    align-items: center;
+    width: 80%;
+    max-width: 35rem;
+    border: solid grey 1.5px;
+}
+
+.dateInput:focus-within {
+    border: solid red 1px;
+}
+
+.dateInput > input, .dateInput p {
+    border: none;
+    padding: none;
+    padding: 0;
+    margin: 0;
+    margin-right: 0.3rem;
+}
+
+.dateInput input {
+    width: 3ch;
+    text-align: right;
+    outline: none;
+}
+
+.div-input {
+    width: 80%;
+    max-width: 20rem;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: .7rem;
+    position: relative;
+}
+
+.div-input ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    /* border: 1px solid #ccc; */
+    position: absolute;
+    width: 100%;
+    max-width: 20rem;
+    box-sizing: border-box;
+    top: 100%;
+}
+
+.div-input ul li:hover {
+    background-color: lightgray;
+    cursor: pointer;
+}
+
+.div-input ul li {
+    background-color: aliceblue;
+}
+
+.div-input input {
+    width: 100%;
+}
+
+.div-outcome {
+    border: 1px solid grey;
+    border-radius: 1%;
+    width: 80%;
+    max-width: 30rem;
+    height: 5rem;
+    background-color: aliceblue;
+    padding: .5rem;
+    overflow-y:scroll;
+}
+
+.div-outcome ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: .3rem;
+}
+
+.div-outcome ul li {
+    border: .5px solid grey;
+    border-radius: 1%;
+    width: fit-content;
+    padding: .2rem;
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .2rem;
+}
+
+.div-outcome ul li:hover{
+    background-color: lightgray;
+}
+
+.div-outcome ul li span {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: red;
+    color: white;
+    padding: .1rem;
+    text-align: center;
+    font-size: .7rem;
+    margin: 0;
+    border-radius: 50%;
+    height: .8rem;
+    width: .8rem;
+    cursor: pointer;
+}
+
+label {
+    text-align: center;
+}

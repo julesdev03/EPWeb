@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='vote_check.css')}}">
+    <script src="{{url_for('static', filename='vote_check.js')}}"></script>
+    <title>Vote checker</title>
+</head>
+<body>
+    <div id="container">
+        <h1>EP VOTE CHECKER</h1>
+        <div id="date-div">
+            <label>Select a date</label>
+            <div class="dateInput">
+                <input type="text" id="day" value="DD">
+                <p>/</p>
+                <input type="text" id="month" value="MM">
+                <p>/</p>
+                <input type="text" id="year" value="YYYY">
+            </div>
+        </div>
+        <div id="additional-div">
+        </div>
+    </div>
+    
+</body>
+</html>
