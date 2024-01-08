@@ -93,9 +93,8 @@ select {
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: 200px;
+    max-height: 8rem;
     overflow-y: auto;
-    /* border: 1px solid #ccc; */
     position: absolute;
     width: 100%;
     max-width: 20rem;

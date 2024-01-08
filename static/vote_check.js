@@ -186,6 +186,7 @@ class manaApp{
       // Will be used to create the search list 
       this.placeHolderMeps = this.mepsList;
       this.selectionMeps = [];
+      this.selectionGroups = [];
 
       // Get a list of groups
       const uniqueParties = new Set();
@@ -207,21 +208,97 @@ class manaApp{
       this.mepInput = document.createElement('input');
       this.mepInput.type = 'text';
       this.mepsChoice = document.createElement('ul');
-      this.mepsChoice.id = 'choices';
       divInput.appendChild(labelInput);
       divInput.appendChild(this.mepInput);
       divInput.appendChild(this.mepsChoice);
-      this.container.appendChild(divInput);
+      this.additionalDiv.appendChild(divInput);
 
       // Create the div containing the MEPs chosen
       let divOutcome = document.createElement('div');
       divOutcome.className = 'div-outcome';
       this.mepsOutcome = document.createElement('ul');
-      this.mepsOutcome.id = 'outcome';
       divOutcome.appendChild(this.mepsOutcome);
-      this.container.appendChild(divOutcome);
+      this.additionalDiv.appendChild(divOutcome);
+
+      // Same for the political groups
+      // Input
+      let divGroups = document.createElement('div');
+      divGroups.className = 'div-input';
+      let labelGroups = document.createElement('label');
+      labelGroups.innerText = "Select the Groups";
+      this.groupInput = document.createElement('input');
+      this.groupInput.type = 'text';
+      this.groupChoice = document.createElement('ul');
+      divGroups.appendChild(labelGroups);
+      divGroups.appendChild(this.groupInput);
+      divGroups.appendChild(this.groupChoice);
+      this.additionalDiv.appendChild(divGroups);
+
+      // Create div containing groups chosen
+      let divGroupOutcome = document.createElement('div');
+      divGroupOutcome.className = 'div-outcome';
+      this.groupOutcome = document.createElement('ul');
+      divGroupOutcome.appendChild(this.groupOutcome);
+      this.additionalDiv.appendChild(divGroupOutcome);
 
       this.setMepInput();
+      this.setGroupInput();
+
+    }
+
+    setGroupInput(){
+      this.placeHolderGroup = this.politicalParties;
+      this.groupInput.addEventListener('input', (e)=>{
+        // Filter based on the input
+        var filteredList = this.placeHolderGroup.filter(item => item.toLowerCase().includes(e.target.value.toLowerCase()));
+        this.groupChoice.innerHTML = '';
+        console.log('CURRENT: '+this.placeHolderGroup);
+        // Create li elements
+        filteredList.forEach(item => {
+          const li = document.createElement('li');
+          li.innerText = item;
+          li.addEventListener('click', ()=>{
+            // Add to the selection list
+            this.selectionGroups.push(item);
+            // Add to the outcome list
+            const li = document.createElement('li');
+            li.innerText = item;
+            // Create the span for the delete
+            const span = document.createElement('span');
+            span.innerText = 'x';
+            li.appendChild(span);
+            // Add the elements to the doc
+            this.groupOutcome.appendChild(li);
+            // Event listener to delete li when clicking on the cross
+            span.addEventListener('click', (e)=>{
+                // Add back to the list of fake
+                this.placeHolderGroup.push(item);
+                // Remove from the choose list
+                var index = this.selectionGroups.indexOf(item);
+                this.selectionGroups.splice(index,1);
+                // Delete the li
+                li.remove();
+            });
+            // Resetting values
+            this.groupInput.value='';
+            this.groupChoice.innerHTML = '';
+            var indexGroup = this.placeHolderGroup.indexOf(item);
+            this.placeHolderGroup.splice(indexGroup, 1);
+          });
+          this.groupChoice.appendChild(li);
+        });
+      });
+
+      // If you click outside the input, the lis disappear
+      // Timeout is made for the lis not to disappear before the click
+      let timeout;
+      this.groupInput.addEventListener('focusout', ()=>{
+          timeout = setTimeout(()=>{this.groupChoice.innerHTML='';},200); 
+      });
+
+      this.groupInput.addEventListener('focus', ()=>{
+          clearTimeout(timeout);
+      });
     }
 
     setMepInput(){
