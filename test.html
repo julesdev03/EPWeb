@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>input test</title>
+
+    <style>
+        body{
+            margin: 0;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 100vw;
+            min-height: 100vh;
+            background-color: beige;
+            position: relative;
+            gap: 2rem;
+        }
+
+        .div-input {
+            width: 80%;
+            max-width: 20rem;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            gap: .7rem;
+            position: relative;
+        }
+
+        .div-input ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            /* border: 1px solid #ccc; */
+            position: absolute;
+            width: 100%;
+            max-width: 20rem;
+            box-sizing: border-box;
+            top: 100%;
+        }
+
+        .div-input ul li:hover {
+            background-color: lightgray;
+            cursor: pointer;
+        }
+
+        .div-input ul li {
+            background-color: aliceblue;
+        }
+
+        .div-input input {
+            width: 100%;
+        }
+
+        .div-outcome {
+            border: 1px solid grey;
+            border-radius: 1%;
+            width: 80%;
+            max-width: 30rem;
+            height: 5rem;
+            background-color: aliceblue;
+            padding: .5rem;
+            overflow-y:scroll;
+        }
+
+        .div-outcome ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: .3rem;
+        }
+
+        .div-outcome ul li {
+            border: .5px solid grey;
+            border-radius: 1%;
+            width: fit-content;
+            padding: .2rem;
+            text-align: left;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: .2rem;
+        }
+
+        .div-outcome ul li:hover{
+            background-color: lightgray;
+        }
+
+        .div-outcome ul li span {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: red;
+            color: white;
+            padding: .1rem;
+            text-align: center;
+            font-size: .7rem;
+            margin: 0;
+            border-radius: 50%;
+            height: .8rem;
+            width: .8rem;
+            cursor: pointer;
+        }
+
+        label {
+            text-align: center;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div class="div-input">
+            <label for="mepname">Select the MEPs or the group to be compared</label>
+            <input id="mep-input" name="mepname" type="text">
+            <ul id="choices">
+            </ul>
+        </div>
+        <div class="div-outcome">
+            <ul id="outcome">
+            </ul>
+        </div>
+    </div>    
+</body>
+
+<script>
+    class manaApp{
+        constructor(){
+            this.mepChoices = document.getElementById('choices');
+            this.mepInput = document.getElementById('mep-input');
+            this.mepsOutcome = document.getElementById('outcome');
+            this.dataList = ["Mikulas Peksa", "Marcel Kolaja", "David Cormand", "François Xavier Bellamy"];
+            this.fakeDataList = this.dataList;
+            this.selectionMeps = [];
+            this.setMepInput();
+        }
+
+        setMepInput(){
+            this.mepInput.addEventListener('input', (e)=>{
+                // Filter the list based on the input
+                var filteredList = this.fakeDataList.filter(item => item.toLowerCase().includes(e.target.value.toLowerCase()));
+                this.mepChoices.innerHTML='';
+                console.log('FAKE '+this.fakeDataList);
+                console.log('FILTERED '+filteredList);
+
+                // Create the li elements based on the filtered list
+                filteredList.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    console.log('ITEM '+item);
+                    li.addEventListener('click', () => {
+                        // Handle the selection
+                        this.addItemToSelectedList(item);
+                        // Reset the input
+                        this.mepInput.value = '';
+                        this.mepChoices.innerHTML = '';
+                        // Delete the mep from the selection
+                        var indexMep = this.fakeDataList.indexOf(item);
+                        this.fakeDataList.splice(indexMep, 1);
+                        console.log('DELETE '+item);
+                    });
+                    this.mepChoices.appendChild(li);
+                });
+            });
+            // If you click outside the input, the lis disappear
+            // Timeout is made for the lis not to disappear before the click
+            let timeout;
+            this.mepInput.addEventListener('focusout', ()=>{
+                timeout = setTimeout(()=>{this.mepChoices.innerHTML='';},200); 
+            });
+
+            this.mepInput.addEventListener('focus', ()=>{
+                clearTimeout(timeout);
+            });
+        }
+
+        addItemToSelectedList(item) {
+            // Add to the the list of selected meps
+            this.selectionMeps.push(item);
+            // Create the li element
+            const li = document.createElement('li');
+            li.innerText = item;
+            // Create the span for the delete
+            const span = document.createElement('span');
+            span.innerText = 'x';
+            li.appendChild(span);
+            // Add the elements to the doc
+            this.mepsOutcome.appendChild(li);
+
+            // Event listener to delete li when clicking on the cross
+            span.addEventListener('click', (e)=>{
+                // Add back to the list of fake
+                this.fakeDataList.push(item);
+                // Delete the li
+                li.remove();
+            });
+
+            console.log(this.selectionMeps);
+        }
+    }
+
+    var appMana = new manaApp();
+    
+    
+
+</script>
+</html>

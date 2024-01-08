@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import json
 from datetime import datetime
+from global_variables import origin_directory
 
 class DBMana():
 
@@ -14,7 +15,7 @@ class DBMana():
         # If the file is already existing
         if self.data_name + ".csv" in os.listdir():
             # Get the csv
-            df1 = pd.read_csv('EPWeb/'+self.data_name + '.csv')
+            df1 = pd.read_csv(origin_directory+self.data_name + '.csv')
 
             # Get the data
             df2 = pd.DataFrame().from_records(self.data)
@@ -55,7 +56,7 @@ class DBMana():
 
     def csvToJson(self):
             # Get csv
-        df1 = pd.read_csv('EPWeb/'+self.data_name + '.csv')
+        df1 = pd.read_csv(origin_directory+self.data_name + '.csv')
         if self.data_name == 'meps':
             df = df1.to_dict(orient='records')
             return json.dumps(df)
@@ -67,7 +68,7 @@ class DBMana():
             return json.dumps(df)
 
     def csvToDf(self):
-        return pd.read_csv('EPWeb/'+self.data_name + '.csv')
+        return pd.read_csv(origin_directory+self.data_name + '.csv')
 
 
 
