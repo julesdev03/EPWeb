@@ -187,6 +187,7 @@ class manaApp{
       this.placeHolderMeps = this.mepsList;
       this.selectionMeps = [];
       this.selectionGroups = [];
+      this.keepDifferent = false;
 
       // Get a list of groups
       const uniqueParties = new Set();
@@ -241,8 +242,127 @@ class manaApp{
       divGroupOutcome.appendChild(this.groupOutcome);
       this.additionalDiv.appendChild(divGroupOutcome);
 
+      // Create tickbox for keep different
+      let divTick = document.createElement('div');
+      divTick.style.gap = ".1rem";
+      // divTick.style.width = "80%";
+      divTick.style.maxWidth = "20rem";
+      divTick.style.display ="flex";
+      divTick.style.alignItems ="center";
+      divTick.style.flexDirection ="row";
+      divTick.style.justifyContent ="center";
+      let tickBox = document.createElement('input');
+      tickBox.type = 'checkbox';
+      let labelTick = document.createElement('label');
+      labelTick.innerText = "Keep only the different votes";
+      divTick.appendChild(tickBox);
+      divTick.appendChild(labelTick);
+      this.additionalDiv.appendChild(divTick);
+      // Event listener
+      tickBox.addEventListener('change', (e)=>{
+        if(this.keepDifferent == false){
+          this.keepDifferent = true;
+        } else {
+          this.keepDifferent = false;
+        }
+        this.createTable();
+      });
+
+      // Set up addition, deletion and list of choices
       this.setMepInput();
       this.setGroupInput();
+    }
+
+    createTable() {
+      if(document.getElementsByClassName('contains-table')[0]){
+        document.getElementsByClassName('contains-table')[0].remove();
+      }
+      // Create table elements
+      // First row
+      var divContainsTable = document.createElement('div');
+      divContainsTable.className="contains-table";
+      var table = document.createElement('table');
+      var thread = document.createElement('thread');
+      var trThread = document.createElement('tr');
+      var thTitle = document.createElement('th');
+      thTitle.innerText = 'Title of the vote';
+      var thMeps = document.createElement('th');
+      thMeps.innerText = "MEPs";
+      var thGroups = document.createElement('th');
+      thGroups.innerText = "Groups";
+      // Append first row
+      trThread.appendChild(thTitle);
+      trThread.appendChild(thMeps);
+      trThread.appendChild(thGroups);
+      thread.appendChild(trThread);
+      table.appendChild(thread);
+      divContainsTable.appendChild(table);
+
+      // Create a line per vote
+      var tbody = document.createElement('tbody');
+      this.listVotes.forEach(vote => {
+        var tr = document.createElement('tr');
+        var votes = [];
+        // Vote title
+        var thVote = document.createElement('th');
+        thVote.innerText = vote.Title;
+
+        // Create column with a class for styling the cell
+        var thMep = document.createElement('th');
+        var divTh = document.createElement('div');
+        divTh.className = "class-td";
+        var voteIdentifier = vote.Identifier;
+        this.selectionMeps.forEach(mep => {
+          // Fill with all MEPs, get their vote
+            var mepVote = this.dataVotes.filter(item => item.Identifier == voteIdentifier && item.PersId == mep.PersId);
+            if(!mepVote[0]){
+              var voteMep = 'Absent';
+            } else {
+              var voteMep = mepVote[0].Vote;
+            }
+            // List of votes to check if there is a difference
+            votes.push(voteMep);
+            // Create the div for the name and the canvas
+            var divMep = document.createElement('div');
+            divMep.className = 'div-mep';
+            divMep.innerText = mep.Name;
+            var canvas = document.createElement("canvas");
+            canvas = drawCanvas(canvas, voteMep);
+            divMep.appendChild(canvas);
+            divTh.appendChild(divMep);
+          }
+        );
+        // Check if votes are different for background color
+        if(votes.every(val => val == votes[0]) == false){
+          tr.style.backgroundColor = "rgba(255, 0, 0, 0.473)";
+        }
+        // Append the mep cell
+        thMep.appendChild(divTh);
+ 
+
+        // Political groups
+        var thGroup = document.createElement('th');
+        thGroup.innerText = this.selectionGroups;
+        
+        if(this.keepDifferent == true && votes.every(val => val == votes[0]) == false){
+          tr.appendChild(thVote);
+          tr.appendChild(thMep);
+          tr.appendChild(thGroup);
+
+          tbody.appendChild(tr);
+        }
+        if(this.keepDifferent == false){
+          tr.appendChild(thVote);
+          tr.appendChild(thMep);
+          tr.appendChild(thGroup);
+
+          tbody.appendChild(tr);
+        }   
+      });
+      table.appendChild(tbody);
+      this.additionalDiv.appendChild(divContainsTable);
+
+
 
     }
 
@@ -278,12 +398,14 @@ class manaApp{
                 this.selectionGroups.splice(index,1);
                 // Delete the li
                 li.remove();
+                this.createTable();
             });
             // Resetting values
             this.groupInput.value='';
             this.groupChoice.innerHTML = '';
             var indexGroup = this.placeHolderGroup.indexOf(item);
             this.placeHolderGroup.splice(indexGroup, 1);
+            this.createTable();
           });
           this.groupChoice.appendChild(li);
         });
@@ -325,6 +447,7 @@ class manaApp{
                   var indexMep = this.placeHolderMeps.indexOf(mepToWithdraw);
                   this.placeHolderMeps.splice(indexMep, 1);
                   console.log('DELETE '+mepToWithdraw.Name);
+                  this.createTable();
               });
               this.mepsChoice.appendChild(li);
           });
@@ -363,9 +486,147 @@ class manaApp{
           this.selectionMeps.splice(index,1);
           // Delete the li
           li.remove();
+          this.createTable();
       });
   }
 
+}
+
+function drawCanvas(canvas, vote){
+  canvas.width = "600";
+  canvas.height = "600";
+  var ctx = canvas.getContext('2d');
+  var x = 300;
+  var y = 300;
+  var r = 300;
+  vote = vote.toUpperCase();
+
+  if(vote == 'AGAINST') {
+    // Draw the circle
+    ctx.beginPath();
+    ctx.arc(x,y,r, 0, Math.PI * 2);
+    ctx.fillStyle = "red";
+    ctx.fill();
+    // Get the slash: first part
+    let coord = polarToCartesian(r*0.6, ((45 * Math.PI) / 180));
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x+coord['x'], y+coord['y']);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+    // Get the slash: second part
+    let coord2 = polarToCartesian(r*0.6, ((225 * Math.PI) / 180));
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x+coord2['x'], y+coord2['y']);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+    // Get the slash: first part
+    let cross = polarToCartesian(r*0.6, ((135 * Math.PI) / 180));
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x+cross['x'], y+cross['y']);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+    // Get the slash: second part
+    let cross2 = polarToCartesian(r*0.6, ((315 * Math.PI) / 180));
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x+cross2['x'], y+cross2['y']);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+  }
+  if(vote == 'FOR') {
+    // Draw the circle
+    ctx.beginPath();
+    ctx.arc(x,y,r, 0, Math.PI * 2);
+    ctx.fillStyle = "green";
+    ctx.fill();
+    // Draw inside: +
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x+0.6*r, y);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+    // Left part
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x-0.6*r, y);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+    // Upper part
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y+r*0.6);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+    // Lower part
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y-r*0.6);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+  }
+  if(vote == 'ABSTENTION') {
+    // Draw the circle
+    ctx.beginPath();
+    ctx.arc(x,y,r, 0, Math.PI * 2);
+    ctx.fillStyle = "black";
+    ctx.fill();
+    // Draw inside: -
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x+0.6*r, y);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+    // Left part
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x-0.6*r, y);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+
+  }
+  if(vote == 'ABSENT') {
+    // Draw the circle
+    ctx.beginPath();
+    ctx.arc(x,y,r, 0, Math.PI * 2);
+    ctx.fillStyle = "grey";
+    ctx.fill();
+    // Get the slash: first part
+    let coord = polarToCartesian(r*0.6, ((130 * Math.PI) / 180));
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x+coord['x'], y+coord['y']);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+    // Get the slash: second part
+    let coord2 = polarToCartesian(r*0.6, ((310 * Math.PI) / 180));
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x+coord2['x'], y+coord2['y']);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 0.3*r;
+    ctx.stroke();
+  }
+  return canvas
+}
+
+function polarToCartesian(radius, angle) {
+  var x = radius * Math.cos(angle);
+  var y = radius * Math.sin(angle);
+  return { "x": x, "y": y };
 }
 
 function readAsTextAsync(file) {

@@ -170,3 +170,98 @@ select {
 label {
     text-align: center;
 }
+
+table {
+    width: 95%;
+}
+
+table, td {
+    border-collapse: collapse;
+}
+
+thead {
+    display: table; /* to take the same width as tr */
+}
+
+tbody {
+    display: block; /* to enable vertical scrolling */
+    max-height: 50vh; /* e.g. */
+    overflow-y: scroll; /* keeps the scrollbar even if it doesn't need it; display purpose */
+    font-size: .7rem;
+    text-align: left;
+}
+
+tr {
+    display: table; /* display purpose; th's border */
+    width: 100%;
+    box-sizing: border-box; /* because of the border (Chrome needs this line, but not FF) */
+}
+
+tr:nth-child(even) {
+    /* background-color: rgba(255, 0, 0, 0.473); */
+    background-color: lightgray;
+}
+
+.contains-table {
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+td, th {
+    padding: .5rem;
+}
+
+th {
+    border-bottom: solid 1px grey;
+}
+
+tbody th {
+    font-weight: 400;
+}
+
+td:first-of-type {
+    width: 35%;
+}
+td:nth-of-type(2) {
+    width: 45%;
+}
+td:nth-of-type(3) {
+    width: auto;
+}
+
+th:first-of-type {
+    width: 35%;
+}
+th:nth-of-type(2) {
+    width: 45%;
+}
+th:nth-of-type(3) {
+    width: auto;
+}
+
+.class-td {
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+.div-mep {
+    padding: .3rem;
+    border: solid grey 1px;
+    background-color: white;
+    border-radius: 1%;
+    width: fit-content;
+    gap: .35rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.div-mep canvas {
+    width: 1rem;
+    height: 1rem;
+}
