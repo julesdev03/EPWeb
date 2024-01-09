@@ -277,6 +277,16 @@ class manaApp{
       if(document.getElementsByClassName('contains-table')[0]){
         document.getElementsByClassName('contains-table')[0].remove();
       }
+      // Get a list of all MEPs per group selected
+      var listGroups = [];
+      this.selectionGroups.forEach(group => {
+        var name = group;
+        var Meps = this.mepsList.filter(item => item.EuParty == group);
+        Meps = Meps.map(x => x.PersId);
+        listGroups.push({"Name": group, "MEPs":Meps});
+      });
+      console.log(listGroups);
+
       // Create table elements
       // First row
       var divContainsTable = document.createElement('div');
@@ -298,7 +308,7 @@ class manaApp{
       table.appendChild(thread);
       divContainsTable.appendChild(table);
 
-      // Create a line per vote
+      // Create tbody of table
       var tbody = document.createElement('tbody');
       this.listVotes.forEach(vote => {
         var tr = document.createElement('tr');
@@ -321,7 +331,9 @@ class manaApp{
               var voteMep = mepVote[0].Vote;
             }
             // List of votes to check if there is a difference
-            votes.push(voteMep);
+            if(voteMep != "Absent"){
+              votes.push(voteMep);
+            }
             // Create the div for the name and the canvas
             var divMep = document.createElement('div');
             divMep.className = 'div-mep';
@@ -332,17 +344,45 @@ class manaApp{
             divTh.appendChild(divMep);
           }
         );
+        // Append the mep cell
+        thMep.appendChild(divTh);
+
+        // Political groups management
+        var thGroup = document.createElement('th');
+        var divGroup = document.createElement('div');
+        divGroup.className = "class-td";
+        listGroups.forEach(group => {
+          // Create the div for the group name and canvas
+          var div = document.createElement('div');
+          div.innerText = group.Name;
+          div.className="div-mep";
+
+          // Calculate the majority vote
+          var votesFor = this.dataVotes.filter(item => item.Identifier == voteIdentifier && item.Vote == 'For' && group.MEPs.includes(parseInt(item.PersId))).length;
+          var votesAgainst = this.dataVotes.filter(item => item.Identifier == voteIdentifier && item.Vote == 'Against' && group.MEPs.includes(parseInt(item.PersId))).length;
+          var votesAbstention = this.dataVotes.filter(item => item.Identifier == voteIdentifier && item.Vote == 'Abstention' && group.MEPs.includes(parseInt(item.PersId))).length;
+          var highest = Math.max(votesAbstention, votesAgainst, votesFor);
+          var arrayVotes = [votesFor, votesAgainst, votesAbstention];
+          var arrayCorresponding = ["For", "Against", "Abstention"];
+          var index = arrayVotes.indexOf(highest);
+
+          // Draw the canvas
+          var canvas = document.createElement("canvas");
+          canvas = drawCanvas(canvas, arrayCorresponding[index]);
+
+          // Push to list of votes for comparison
+          votes.push(arrayCorresponding[index]);
+
+          // Append 
+          div.appendChild(canvas);
+          divGroup.appendChild(div);
+        });
+        thGroup.appendChild(divGroup);
+
         // Check if votes are different for background color
         if(votes.every(val => val == votes[0]) == false){
           tr.style.backgroundColor = "rgba(255, 0, 0, 0.473)";
         }
-        // Append the mep cell
-        thMep.appendChild(divTh);
- 
-
-        // Political groups
-        var thGroup = document.createElement('th');
-        thGroup.innerText = this.selectionGroups;
         
         if(this.keepDifferent == true && votes.every(val => val == votes[0]) == false){
           tr.appendChild(thVote);
