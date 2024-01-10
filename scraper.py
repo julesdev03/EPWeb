@@ -17,5 +17,5 @@ def mep_scraper():
     db = DBMana(data=datan, data_name='meps')
     db.compareAndSave()
 
-# date_scraper()
+date_scraper()
 mep_scraper()

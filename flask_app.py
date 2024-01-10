@@ -5,6 +5,7 @@ import json
 import pandas as pd
 from PIL import Image, ImageDraw
 from io import BytesIO
+from global_variables import origin_directory
 
 app = Flask(__name__)
 
@@ -12,18 +13,22 @@ app = Flask(__name__)
 def hello():
     return 'Hello, World!l'
 
+@app.route('/check_vote')
+def checkVote():
+    return render_template('check_vote.html')
+
 @app.route('/api/logo')
 def imgMana():
     args = request.args
     if args.get('party'):
-        f = open('EPWeb/party_logo.json')
+        f = open('party_logo.json')
         data = json.load(f)
         try:
             img_path = data[args.get('party')]
             if args.get('width') != None and args.get('height') != None:
                 print('Path:' + 'logos/'+img_path+'.jpg')
                 try:
-                    with Image.open('EPWeb/logos/'+img_path+'.jpg') as img:
+                    with Image.open(origin_directory+'logos/'+img_path+'.jpg') as img:
                         print('Processing img')
                         img = img.resize((int(args.get('width')), int(args.get('height'))), Image.LANCZOS)
                         img_buffer = BytesIO()
@@ -33,7 +38,7 @@ def imgMana():
                 except Exception as error:
                     print(error)
             else:
-                return send_file('EPWeb/logos/'+img_path+'.jpg', mimetype='image/gif')
+                return send_file(origin_directory+'logos/'+img_path+'.jpg', mimetype='image/gif')
         except:
             image = Image.new('RGB', (600, 335), color='white')
             draw = ImageDraw.Draw(image)
@@ -72,7 +77,8 @@ def datesAPI():
         mana = DBMana(data_name="dates")
         return mana.csvToJson()
     except Exception as error:
-        return error
+        print(error)
+        return "Error"
 
 @app.route('/api/list_countries')
 def countriesAPI():
