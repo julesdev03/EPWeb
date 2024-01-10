@@ -21,7 +21,7 @@ def checkVote():
 def imgMana():
     args = request.args
     if args.get('party'):
-        f = open('party_logo.json')
+        f = open(origin_directory+'party_logo.json')
         data = json.load(f)
         try:
             img_path = data[args.get('party')]
