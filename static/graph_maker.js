@@ -70,7 +70,8 @@ class manaApp{
     async getDates(){
         // Get plenary dates
         try{
-            let response = await fetch("https://judev03.pythonanywhere.com/api/dates");
+            const url = new URL('api/dates', window.location.origin);
+            let response = await fetch(url);
             let data = await response.text();
             this.dates_list = JSON.parse(data);
             console.log(this.dates_list);
@@ -238,7 +239,8 @@ class manaApp{
         // Get meps based on the date
         try{
             console.log(this.date);
-            let response = await fetch("https://judev03.pythonanywhere.com/api/meps?date="+this.date);
+            const url = new URL('api/meps?date='+this.date, window.location.origin);
+            let response = await fetch(url);
             let data = await response.text();
             this.mepsList = JSON.parse(data);
             console.log(this.mepsList);
@@ -423,7 +425,8 @@ class manaApp{
 
     async getCountries() {
         try{
-            let response = await fetch("https://judev03.pythonanywhere.com/api/list_countries");
+            const url = new URL('api/list_countries', window.location.origin);
+            let response = await fetch(url);
             let data = await response.text();
             this.listCountries = JSON.parse(data);
             console.log(this.listCountries);
@@ -574,7 +577,8 @@ class canvaMana{
                 this.ctx.fillRect(XPoint, YPoint, realColumnWidth, realpxPerMep);
 
                 // Draw the logo
-                await this.drawLogo('https://judev03.pythonanywhere.com/api/logo?party='+data[i].NationalParty+'&width='+Math.floor((logoWidth*100)/100)+'&height='+Math.floor((realpxPerMep*100)/100), [XPoint, YPoint, logoWidth, realpxPerMep]);
+                const url = new URL('api/logo?party='+data[i].NationalParty+'&width='+Math.floor((logoWidth*100)/100)+'&height='+Math.floor((realpxPerMep*100)/100), window.location.origin);
+                await this.drawLogo(url, [XPoint, YPoint, logoWidth, realpxPerMep]);
 
                 // Vote
                 // Get relative coordinates and width of circle
