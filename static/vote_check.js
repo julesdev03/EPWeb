@@ -279,13 +279,35 @@ class manaApp{
       }
       // Get a list of all MEPs per group selected
       var listGroups = [];
-      this.selectionGroups.forEach(group => {
-        var name = group;
-        var Meps = this.mepsList.filter(item => item.EuParty == group);
-        Meps = Meps.map(x => x.PersId);
-        listGroups.push({"Name": group, "MEPs":Meps});
-      });
-      console.log(listGroups);
+      if(this.selectionGroups.length > 0){
+        this.selectionGroups.forEach(group => {
+          var name = group;
+          var Meps = this.mepsList.filter(item => item.EuParty == group);
+          Meps = Meps.map(x => x.PersId);
+          listGroups.push({"Name": group, "MEPs":Meps});
+        });
+      }
+    
+      // Improve performance of filtering by only keeping relevant meps
+      var relevantMeps = [];
+      // Get MEPs from groups
+      if(listGroups.length > 0){
+        listGroups.forEach(group => {
+          console.log(group.MEPs);
+          var meps = group.MEPs
+          meps.forEach(mep => {
+            relevantMeps.push(mep);
+          });
+        });
+      }
+      // Get MEPs individually
+      if(this.selectionMeps){
+        this.selectionMeps.forEach( mep =>{
+          relevantMeps.push(mep.PersId);
+        });
+        }
+      // Keep only relevant votes from selected MEPs
+      var relevantVotes = this.dataVotes.filter(obj => relevantMeps.includes(parseInt(obj.PersId)));
 
       // Create table elements
       // First row
@@ -311,6 +333,9 @@ class manaApp{
       // Create tbody of table
       var tbody = document.createElement('tbody');
       this.listVotes.forEach(vote => {
+        // keep only relevant vote for further filtering
+        var relevantVoteOperational = relevantVotes.filter(item => item.Identifier == vote.Identifier);
+
         var tr = document.createElement('tr');
         var votes = [];
         // Vote title
@@ -324,7 +349,7 @@ class manaApp{
         var voteIdentifier = vote.Identifier;
         this.selectionMeps.forEach(mep => {
           // Fill with all MEPs, get their vote
-            var mepVote = this.dataVotes.filter(item => item.Identifier == voteIdentifier && item.PersId == mep.PersId);
+            var mepVote = relevantVoteOperational.filter(item => item.Identifier == voteIdentifier && item.PersId == mep.PersId);
             if(!mepVote[0]){
               var voteMep = 'Absent';
             } else {
@@ -358,9 +383,9 @@ class manaApp{
           div.className="div-mep";
 
           // Calculate the majority vote
-          var votesFor = this.dataVotes.filter(item => item.Identifier == voteIdentifier && item.Vote == 'For' && group.MEPs.includes(parseInt(item.PersId))).length;
-          var votesAgainst = this.dataVotes.filter(item => item.Identifier == voteIdentifier && item.Vote == 'Against' && group.MEPs.includes(parseInt(item.PersId))).length;
-          var votesAbstention = this.dataVotes.filter(item => item.Identifier == voteIdentifier && item.Vote == 'Abstention' && group.MEPs.includes(parseInt(item.PersId))).length;
+          var votesFor = relevantVoteOperational.filter(item => item.Identifier == voteIdentifier && item.Vote == 'For' && group.MEPs.includes(parseInt(item.PersId))).length;
+          var votesAgainst = relevantVoteOperational.filter(item => item.Identifier == voteIdentifier && item.Vote == 'Against' && group.MEPs.includes(parseInt(item.PersId))).length;
+          var votesAbstention = relevantVoteOperational.filter(item => item.Identifier == voteIdentifier && item.Vote == 'Abstention' && group.MEPs.includes(parseInt(item.PersId))).length;
           var highest = Math.max(votesAbstention, votesAgainst, votesFor);
           var arrayVotes = [votesFor, votesAgainst, votesAbstention];
           var arrayCorresponding = ["For", "Against", "Abstention"];
@@ -412,7 +437,6 @@ class manaApp{
         // Filter based on the input
         var filteredList = this.placeHolderGroup.filter(item => item.toLowerCase().includes(e.target.value.toLowerCase()));
         this.groupChoice.innerHTML = '';
-        console.log('CURRENT: '+this.placeHolderGroup);
         // Create li elements
         filteredList.forEach(item => {
           const li = document.createElement('li');
@@ -468,14 +492,11 @@ class manaApp{
         // Filter based on the input
           var filteredList = this.placeHolderMeps.filter(item => item.Name.toLowerCase().includes(e.target.value.toLowerCase()));
           this.mepsChoice.innerHTML='';
-          console.log('FAKE '+this.placeHolderMeps);
-          console.log('FILTERED '+filteredList);
 
           // Create the li elements based on the filtered list
           filteredList.forEach(item => {
               const li = document.createElement('li');
               li.innerText = item.Name;
-              console.log('ITEM '+item.Name);
               li.addEventListener('click', () => {
                   // Handle the selection
                   this.addItemToSelectedList(item);
@@ -486,7 +507,6 @@ class manaApp{
                   var mepToWithdraw = this.placeHolderMeps.find(i=>i == item);
                   var indexMep = this.placeHolderMeps.indexOf(mepToWithdraw);
                   this.placeHolderMeps.splice(indexMep, 1);
-                  console.log('DELETE '+mepToWithdraw.Name);
                   this.createTable();
               });
               this.mepsChoice.appendChild(li);
