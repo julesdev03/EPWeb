@@ -17,6 +17,12 @@ def hello():
 def checkVote():
     return render_template('check_vote.html')
 
+@app.route('/api/language')
+def languageAPI():
+    f = open(origin_directory+"language.json")
+    data = json.load(f)
+    return data
+
 @app.route('/api/logo')
 def imgMana():
     args = request.args

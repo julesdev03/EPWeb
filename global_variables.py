@@ -1,1 +1,1 @@
-origin_directory = 'EPWeb/'
+origin_directory = ''

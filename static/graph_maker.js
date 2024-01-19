@@ -6,14 +6,17 @@ class manaApp{
     urlVote = ['https://www.europarl.europa.eu/doceo/document/PV-9-{date}-RCV_EN.xml', 'https://www.europarl.europa.eu/doceo/document/PV-9-{date}-RCV_FR.xml']
     constructor(){
         this.file_uploaded = null;
+        this.voteChoice = null;
+        this.outcome = null;
         this.dataVotes = [];
         this.listVotes = [];
         this.container = document.getElementById('container');
         this.dateDiv = document.getElementById('date-div');
         this.additionalDiv = document.getElementById('additional-div');
-        this.manageDateInput();
         this.getDates();
         this.getCountries();
+        this.getLanguage();
+        this.manageDateInput();
     }
 
     manageDateInput(){
@@ -249,7 +252,44 @@ class manaApp{
         }
     }
 
+    async getLanguage(){
+        // Get meps based on the date
+        try{
+            const url = new URL('api/language', window.location.origin);
+            let response = await fetch(url);
+            let data = await response.text();
+            this.language = JSON.parse(data);
+            console.log(this.language);
+        } catch(error) {
+            console.log(error);
+        }
+    }
+
     createMenu() {
+        // Create choice of language
+        var divLanguageChoice = document.createElement('div');
+        divLanguageChoice.className = 'divSmallContainer';
+        let labelLanguageChoice = document.createElement('label');
+        labelLanguageChoice.innerText = 'Choose the language';
+        let selectLanguageChoice = document.createElement('select');
+        // Get all languages
+        let languages = Object.keys(this.language);
+        this.chosenLanguage = null;
+        // Create all options for the select element
+        for(let i = 0; i<languages.length;i++){
+            let optionEl = document.createElement('option');
+            optionEl.innerText = languages[i];
+            optionEl.value = languages[i];
+            optionEl.title = languages[i];
+            selectLanguageChoice.appendChild(optionEl);
+            // Make the first option the chose one
+            if(i == 0) {
+                this.chosenLanguage = this.language[languages[i]];
+            }
+        }
+        divLanguageChoice.appendChild(labelLanguageChoice);
+        divLanguageChoice.appendChild(selectLanguageChoice);
+
         // Create choice of vote
         var divVoteChoice = document.createElement('div');
         divVoteChoice.className = 'divSmallContainer';
@@ -316,20 +356,24 @@ class manaApp{
         // Merge and display
         this.additionalDiv.appendChild(divVoteChoice);
         this.additionalDiv.appendChild(divCountryChoice);
+        this.additionalDiv.appendChild(divLanguageChoice);
         this.additionalDiv.appendChild(divTitleInput);
-        this.canvaMana = new canvaMana();
+        this.canvaMana = new canvaMana(this.chosenLanguage);
         this.createDownload();
-        // Event listeners
+
+        // Event listeners: title management
         inputTitle.addEventListener('input', (e)=>{
             this.canvaMana.titleMana(e.target.value);
         });
+
+        // Event listener: select the vote: write the title and the outcome
         selectVoteChoice.addEventListener('change', async (e)=>{
             if(divVoteChoice.getElementsByClassName('divSmallContainer')[0]){
                 divVoteChoice.getElementsByClassName('divSmallContainer')[0].remove();
             }
             this.voteChoice = e.target.value;
             this.outcome = this.getOutcome();
-            this.canvaMana.setAllFooter(e.target.value, this.outcome);
+            this.canvaMana.setAllFooter(e.target.value, this.outcome, this.chosenLanguage);
             // Check if the length of the voteChoice is more than 3 lines
             if(this.canvaMana.checkLengthVoteChoice(e.target.value)){
                 let divInputVoteChoice = document.createElement('div');
@@ -347,17 +391,29 @@ class manaApp{
                 divVoteChoice.appendChild(divInputVoteChoice);
 
                 inputVoteChoice.addEventListener('input', (e)=> {
-                    this.canvaMana.setAllFooter(e.target.value, this.outcome);
+                    this.canvaMana.setAllFooter(e.target.value, this.outcome, this.chosenLanguage);
                 });
             }
             let mergedArray = await this.startMepsLayout();
             this.canvaMana.processMepsLayout(mergedArray);
         });
+
+        // Process when country is chosen
         selectCountryChoice.addEventListener('change', async (e)=> {
             this.countryChoice = e.target.value;
             let mergedArray = await this.startMepsLayout();
             this.canvaMana.processMepsLayout(mergedArray);
         });
+
+        // Event Listener: language
+        selectLanguageChoice.addEventListener('change', (e)=>{
+            this.chosenLanguage = this.language[e.target.value];
+            if(this.voteChoice != null && this.outcome != null){
+                this.canvaMana.setAllFooter(this.voteChoice, this.outcome, this.chosenLanguage);
+            } else {
+                this.canvaMana.footerBlue(this.chosenLanguage);
+            }
+        })
     }
 
     startMepsLayout() {
@@ -458,7 +514,7 @@ class canvaMana{
     orange= 'black';
     grey = 'grey';
 
-    constructor(){
+    constructor(language){
         // Set up the canvas
         this.canvas = document.createElement('canvas');
         this.canvas.width = '1200';
@@ -478,7 +534,7 @@ class canvaMana{
         this.footerHeight = this.canvas.height*0.15;
         this.ctx.imageSmoothingEnabled = true;
         this.headerBlue();
-        this.footerBlue();
+        this.footerBlue(language);
     }
 
     headerBlue() {
@@ -487,19 +543,19 @@ class canvaMana{
         this.ctx.fillRect(0, 0, this.canvas.width, this.headerHeight);
     }
 
-    footerBlue() {
+    footerBlue(language) {
         // Delete and draw the blue rectangle
         this.ctx.clearRect(0, (this.canvas.height-this.footerHeight), this.canvas.width, (this.footerHeight));
         this.ctx.fillStyle = this.darkBlue;
         this.ctx.fillRect(0, (this.canvas.height-this.footerHeight), this.canvas.width, (this.footerHeight));
         // Draw votes indications
-        this.drawVotesIndications();
+        this.drawVotesIndications(language);
     }
 
-    setAllFooter(titleText, outcome) {
-        this.footerBlue();
-        this.writeVote(titleText);
-        this.writeOutcome(outcome);
+    setAllFooter(titleText, outcome, language) {
+        this.footerBlue(language);
+        this.writeVote(titleText, language);
+        this.writeOutcome(outcome, language);
     }
 
     drawLogo(url, coordinates) {
@@ -615,13 +671,13 @@ class canvaMana{
             }
       }
 
-    writeOutcome(outcome) {
+    writeOutcome(outcome, language) {
         // Write outcome
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'center';
         let outcomeFont = (15*this.canvas.height)/335;
         this.ctx.font = "bold "+ outcomeFont + 'px ' +this.fontCanvas;
-        this.ctx.fillText('OUTCOME', (this.canvas.width*0.88), (this.canvas.height*0.91));
+        this.ctx.fillText(language.OUTCOME, (this.canvas.width*0.88), (this.canvas.height*0.91));
 
         // Get the Y starting position
         let YText = (323*this.canvas.height)/335;
@@ -674,8 +730,8 @@ class canvaMana{
         this.drawCircle(r, XStart, YCircle, 'ABSTENTION');
     }
 
-    writeVote(text) {
-        this.footerBlue();
+    writeVote(text, language) {
+        this.footerBlue(language);
         // Write the vote title
         // Set up ctx
         this.ctx.fillStyle = 'white';
@@ -826,7 +882,7 @@ class canvaMana{
         }
     }
 
-    drawVotesIndications() {
+    drawVotesIndications(language) {
         // Basic positioning values
         let r = ((7*this.canvas.width)/600);
         let circlePadding= ((3*this.canvas.width)/600);
@@ -849,10 +905,10 @@ class canvaMana{
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'left';
         this.ctx.font = "bold "+ ((12*this.canvas.height)/335)+ 'px '+ this.fontCanvas
-        this.ctx.fillText('IN FAVOUR', XStart, YText);
+        this.ctx.fillText(language.FOR, XStart, YText);
 
         // Update XStart
-        XStart += r + postTextMargin + this.ctx.measureText('IN FAVOUR').width;
+        XStart += r + postTextMargin + this.ctx.measureText(language.FOR).width;
         // AGAINST
         this.drawCircle(r, XStart, YCircle, 'AGAINST');
         // Update XStart
@@ -861,10 +917,10 @@ class canvaMana{
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'left';
         this.ctx.font = "bold "+ ((12*this.canvas.height)/335)+ 'px '+ this.fontCanvas
-        this.ctx.fillText('AGAINST', XStart, YText);
+        this.ctx.fillText(language.AGAINST, XStart, YText);
 
         // Update XStart
-        XStart += r + postTextMargin + this.ctx.measureText('AGAINST').width;
+        XStart += r + postTextMargin + this.ctx.measureText(language.AGAINST).width;
         // ABSTENTION
         this.drawCircle(r, XStart, YCircle, 'ABSTENTION');
         // Update XStart
@@ -873,10 +929,10 @@ class canvaMana{
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'left';
         this.ctx.font = "bold "+ ((12*this.canvas.height)/335)+ 'px '+ this.fontCanvas
-        this.ctx.fillText('ABSTENTION', XStart, YText);
+        this.ctx.fillText(language.ABSTENTION, XStart, YText);
 
         // Update XStart
-        XStart += r + postTextMargin + this.ctx.measureText('ABSTENTION').width;
+        XStart += r + postTextMargin + this.ctx.measureText(language.ABSTENTION).width;
         // ABSENT
         this.drawCircle(r, XStart, YCircle, 'ABSENT');
         // Update Xstart
@@ -885,7 +941,7 @@ class canvaMana{
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'left';
         this.ctx.font = "bold "+ ((12*this.canvas.height)/335)+ 'px '+ this.fontCanvas
-        this.ctx.fillText('ABSENT', XStart, YText);
+        this.ctx.fillText(language.ABSENT, XStart, YText);
 
     }
 
