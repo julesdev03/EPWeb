@@ -574,7 +574,7 @@ class manaApp{
 
 class canvaMana{
     darkBlue = '#00008B';
-    fontCanvas = "Arial";
+    fontCanvas = "Tahoma";
     red = 'red';
     green = 'green';
     orange= 'black';
