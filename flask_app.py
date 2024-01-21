@@ -13,6 +13,10 @@ app = Flask(__name__)
 def hello():
     return 'Hello, World!l'
 
+@app.route('/fonts/tahoma.ttf')
+def fonts():
+    return send_file(origin_directory+'tahoma.ttf')
+
 @app.route('/check_vote')
 def checkVote():
     return render_template('check_vote.html')

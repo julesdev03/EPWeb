@@ -459,6 +459,16 @@ class manaApp{
 
                         return 0; // Objects are equal in sorting criteria
                     });
+                    // Get Patrick Breyer first
+                    // Get his vote based on name
+                    let PatrickVote = mergedArray.filter(item => item.Name == "Patrick Breyer");
+                    // If he voted, get him first and wihdraw his vote from the other spot
+                    if(PatrickVote.length > 0){
+                        let index = mergedArray.indexOf(PatrickVote[0]);
+                        mergedArray.splice(index, 1);
+                        mergedArray.unshift(PatrickVote[0]);                     
+                    }
+                    // Resolve with the data
                     resolve(mergedArray);
                 }
             } catch(error) {
@@ -508,7 +518,7 @@ class manaApp{
 
 class canvaMana{
     darkBlue = '#00008B';
-    fontCanvas = 'Courier New';
+    fontCanvas = "Arial";
     red = 'red';
     green = 'green';
     orange= 'black';
@@ -599,7 +609,7 @@ class canvaMana{
         // Get the font for the name
         let fontName = (realpxPerMep*0.75);
         this.ctx.font = 'bold '+fontName+'px '+this.fontCanvas;
-        let xWidth = ((realColumnWidth)-(logoWidth+logoToTextPadding+realpxPerMep))*0.98;
+        let xWidth = ((realColumnWidth)-(logoWidth+logoToTextPadding+realpxPerMep))*0.95;
         for(let j=0;data.length>j;j++) {
             let name = data[j].Name;
             name = name.toUpperCase();
@@ -827,53 +837,57 @@ class canvaMana{
     titleMana(text){
         // Clear the area and restructure it
         this.headerBlue();
-        let font = Math.ceil((22*this.headerHeight)/60);
+        let font = Math.ceil((21*this.headerHeight)/60);
         // Set up the context
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'center';
         this.ctx.font = "bold "+font+'px '+this.fontCanvas;
         // Several lines system: one line is around 93% of the width
-        if(this.ctx.measureText(text).width>(this.canvas.width*(1-0.07))) {
-            // Split the text
-            let splitText = text.split(' ');
-            // Fill as much words as possible in a 320 line, put them in lines array
-            let lines = [];
-            let placeLine = '';
-            // Change font size for sligthly smaller
-
-            for(let j = 0; splitText.length>j; j++) {
-                // Fake line allows comparison without adding the el to the real line
-                let fakeLine = placeLine;
-                if(j == 0) {
-                    fakeLine += splitText[j];
-                } else {
-                    fakeLine += ' ' + splitText[j];
-                }
-                // Check if the text is more than a line
-                if(this.ctx.measureText(fakeLine).width<(this.canvas.width*(1-0.07))) {
+        if(this.ctx.measureText(text.toUpperCase()).width>(this.canvas.width*(1-0.05))) {
+            // Two lines solution
+            this.ctx.font = "bold "+font*0.85+'px '+this.fontCanvas;
+            if(this.ctx.measureText(text.toUpperCase()).width>(this.canvas.width*(1-0.05))){
+                // Split the text
+                let splitText = text.split(' ');
+                // Fill as much words as possible in a 320 line, put them in lines array
+                let lines = [];
+                let placeLine = '';
+                for(let j = 0; splitText.length>j; j++) {
+                    // Fake line allows comparison without adding the el to the real line
+                    let fakeLine = placeLine;
                     if(j == 0) {
-                        placeLine += splitText[j];
+                        fakeLine += splitText[j];
                     } else {
-                        placeLine += ' ' + splitText[j];
+                        fakeLine += ' ' + splitText[j];
                     }
-                } else {
-                    lines.push(placeLine);
-                    placeLine = splitText[j];
+                    // Check if the text is more than a line
+                    if(this.ctx.measureText(fakeLine.toUpperCase()).width<(this.canvas.width*(1-0.05))) {
+                        if(j == 0) {
+                            placeLine += splitText[j];
+                        } else {
+                            placeLine += ' ' + splitText[j];
+                        }
+                    } else {
+                        lines.push(placeLine);
+                        placeLine = splitText[j];
+                    }
+                    // Add the last line
+                    if(splitText.length - 1 == j) {
+                        lines.push(placeLine);
+                    }
                 }
-                // Add the last line
-                if(splitText.length - 1 == j) {
-                    lines.push(placeLine);
+                // Parse the lines array to create a line everytime
+                // px is the starting point of the text vertically, we then add more px for every line
+                let px = 2.4;
+                for(let j = 0; lines.length>j; j++) {
+                    this.ctx.fillText(lines[j].toUpperCase(), (this.canvas.width/2), this.headerHeight/px);
+                    px = px/1.9;
                 }
+            } else {
+                // One line solution with smaller text
+                this.ctx.fillText(text.toUpperCase(), (this.canvas.width/2), (((this.headerHeight)/2)+(font/3)));
             }
-            // Parse the lines array to create a line everytime
-            // px is the starting point of the text vertically, we then add more px for every line
-            let px = 2.4;
-            font = font*0.9;
-            this.ctx.font = "bold "+font+'px '+this.fontCanvas;
-            for(let j = 0; lines.length>j; j++) {
-                this.ctx.fillText(lines[j].toUpperCase(), (this.canvas.width/2), this.headerHeight/px);
-                px = px/1.9;
-            }
+            
         }
         // If only one line needed: center
         else {
