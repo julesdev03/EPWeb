@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    font-family: Tahoma, Geneva, Verdana, sans-serif;
 }
 
 canvas {
@@ -7,6 +8,7 @@ canvas {
     background-color: white;
     width: 700px;
     height: 366px;
+    font-family: Tahoma, Geneva, Verdana, sans-serif;
 }
 
 @media (max-width: 768px) {

@@ -1,4 +1,8 @@
 PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
+23788,Adam Bielan,ECR,Poland,Prawo i Sprawiedliwość,2024-07-02,2019-06-02
+239255,Matteo Gazzini,EPP,Italy,Independent,2024-07-02,2022-11-02
+124700,Jana Toom,Renew,Estonia,Eesti Keskerakond,2024-07-02,2019-06-02
+197508,Stéphane Séjourné,Renew,France,La République en marche,2024-01-11,2019-07-02
 251324,Krzysztof Brejza,EPP,Poland,Platforma Obywatelska,2024-07-02,2024-01-03
 197626,Hervé Juvin,NI,France,Indépendant,2024-07-02,2019-06-02
 251268,Michael Kauch,Renew,Germany,Freie Demokratische Partei,2024-07-02,2024-01-01
@@ -62,7 +66,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 4746,Sergio Berlato,ECR,Italy,Fratelli d'Italia,2024-07-02,2020-02-01
 197648,Alexander Bernhuber,EPP,Austria,Österreichische Volkspartei,2024-07-02,2019-06-02
 197498,Robert Biedroń,S&D,Poland,Nowa Lewica,2024-07-02,2019-06-02
-23788,Adam Bielan,ECR,Poland,Partia Republikańska,2024-07-02,2019-06-02
 197551,Stéphane Bijoux,Renew,France,La République en marche,2024-07-02,2019-06-02
 96922,Izaskun Bilbao Barandica,Renew,Spain,Partido Nacionalista Vasco,2024-07-02,2019-06-02
 197771,Vladimír Bilčík,EPP,Slovakia,Independent,2024-07-02,2019-06-02
@@ -224,7 +227,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 28298,Iratxe García Pérez,S&D,Spain,Partido Socialista Obrero Español,2024-07-02,2019-06-02
 96991,Eider Gardiazabal Rubial,S&D,Spain,Partido Socialista Obrero Español,2024-07-02,2019-06-02
 197628,Jean-Paul Garraud,ID,France,Rassemblement national,2024-07-02,2019-06-02
-239255,Matteo Gazzini,NI,Italy,Independent,2024-07-02,2022-11-02
 183916,Alexandra Geese,Greens/EFA,Germany,Bündnis 90/Die Grünen,2024-07-02,2019-06-02
 96833,Jens Geier,S&D,Germany,Sozialdemokratische Partei Deutschlands,2024-07-02,2019-06-02
 197794,Chiara Gemma,ECR,Italy,FRATELLI D' ITALIA,2024-07-02,2019-06-02
@@ -579,7 +581,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 124837,Joachim Schuster,S&D,Germany,Sozialdemokratische Partei Deutschlands,2024-07-02,2019-06-02
 28223,Andreas Schwab,EPP,Germany,Christlich Demokratische Union Deutschlands,2024-07-02,2019-06-02
 197425,Ralf Seekatz,EPP,Germany,Christlich Demokratische Union Deutschlands,2024-07-02,2019-06-02
-197508,Stéphane Séjourné,Renew,France,La République en marche,2024-07-02,2019-06-02
 197418,Monica Semedo,Renew,Luxembourg,Indépendent,2024-07-02,2019-06-02
 197423,Nico Semsrott,Greens/EFA,Germany,Independent,2024-07-02,2019-06-02
 197677,Günther Sidl,S&D,Austria,Sozialdemokratische Partei Österreichs,2024-07-02,2019-06-02
@@ -625,7 +626,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 197672,Eugen Tomac,EPP,Romania,Partidul Mișcarea Populară,2024-07-02,2019-06-02
 96697,Waldemar Tomaszewski,ECR,Lithuania,Lietuvos lenkų rinkimų akcija – Krikščioniškų šeimų sąjunga,2024-07-02,2019-06-02
 125104,Romana Tomc,EPP,Slovenia,Slovenska demokratska stranka,2024-07-02,2019-06-02
-124700,Yana Toom,Renew,Estonia,Eesti Keskerakond,2024-07-02,2019-06-02
 114268,Nils Torvalds,Renew,Finland,Svenska folkpartiet,2024-07-02,2019-06-02
 96713,Evžen Tošenovský,ECR,Czechia,Občanská demokratická strana,2024-07-02,2019-06-02
 27714,Edina Tóth,NI,Hungary,Fidesz-Magyar Polgári Szövetség-Kereszténydemokrata Néppárt,2024-07-02,2019-06-02

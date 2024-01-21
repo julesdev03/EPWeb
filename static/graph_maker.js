@@ -6,14 +6,19 @@ class manaApp{
     urlVote = ['https://www.europarl.europa.eu/doceo/document/PV-9-{date}-RCV_EN.xml', 'https://www.europarl.europa.eu/doceo/document/PV-9-{date}-RCV_FR.xml']
     constructor(){
         this.file_uploaded = null;
+        this.voteChoice = null;
+        this.outcome = null;
+        this.titleText = "";
         this.dataVotes = [];
         this.listVotes = [];
         this.container = document.getElementById('container');
         this.dateDiv = document.getElementById('date-div');
         this.additionalDiv = document.getElementById('additional-div');
-        this.manageDateInput();
         this.getDates();
         this.getCountries();
+        this.getLanguage();
+        this.getLogosList();
+        this.manageDateInput();
     }
 
     manageDateInput(){
@@ -65,6 +70,18 @@ class manaApp{
             this.dateListener();
         }, false);
 
+    }
+
+    async getLogosList(){
+        try{
+            const url = new URL('api/logos_list', window.location.origin);
+            let response = await fetch(url);
+            let data = await response.text();
+            this.logosList = JSON.parse(data);
+            console.log(this.logosList);
+        } catch(error) {
+            console.log(error);
+        }
     }
 
     async getDates(){
@@ -249,7 +266,44 @@ class manaApp{
         }
     }
 
+    async getLanguage(){
+        // Get meps based on the date
+        try{
+            const url = new URL('api/language', window.location.origin);
+            let response = await fetch(url);
+            let data = await response.text();
+            this.language = JSON.parse(data);
+            console.log(this.language);
+        } catch(error) {
+            console.log(error);
+        }
+    }
+
     createMenu() {
+        // Create choice of language
+        var divLanguageChoice = document.createElement('div');
+        divLanguageChoice.className = 'divSmallContainer';
+        let labelLanguageChoice = document.createElement('label');
+        labelLanguageChoice.innerText = 'Choose the language';
+        let selectLanguageChoice = document.createElement('select');
+        // Get all languages
+        let languages = Object.keys(this.language);
+        this.chosenLanguage = null;
+        // Create all options for the select element
+        for(let i = 0; i<languages.length;i++){
+            let optionEl = document.createElement('option');
+            optionEl.innerText = languages[i];
+            optionEl.value = languages[i];
+            optionEl.title = languages[i];
+            selectLanguageChoice.appendChild(optionEl);
+            // Make the first option the chose one
+            if(i == 0) {
+                this.chosenLanguage = this.language[languages[i]];
+            }
+        }
+        divLanguageChoice.appendChild(labelLanguageChoice);
+        divLanguageChoice.appendChild(selectLanguageChoice);
+
         // Create choice of vote
         var divVoteChoice = document.createElement('div');
         divVoteChoice.className = 'divSmallContainer';
@@ -303,6 +357,39 @@ class manaApp{
         divCountryChoice.appendChild(labelCountryChoice);
         divCountryChoice.appendChild(selectCountryChoice);
 
+        // Logos list choice
+        var divLogosChoice = document.createElement('div');
+        divLogosChoice.className = 'divSmallContainer';
+        var labelLogosChoice = document.createElement('label');
+        labelLogosChoice.innerText = 'Choose the logo to be displayed next to the title';
+        var selectLogosChoice = document.createElement('select');
+        // Create html elements
+        for(let i = -1; i < this.logosList.length; i++) {
+            let optionEl = document.createElement('option');
+            // Create an empty option
+            if(i == -1) {
+                optionEl.innerText = ''
+                optionEl.value = ''
+            } else {
+                // Truncate the text in the middle
+                optionEl.innerText = this.logosList[i];
+                optionEl.value = this.logosList[i]
+                optionEl.title = this.logosList[i]
+            }
+            selectLogosChoice.appendChild(optionEl);}
+        // Get Pirates selected as default
+        if(this.logosList.indexOf('European Pirates')) {
+            let indexLogo = this.logosList.indexOf('European Pirates');
+            selectLogosChoice.selectedIndex = indexLogo +1;
+            this.chosenLogo = 'European Pirates';
+        } else {
+            selectLogosChoice.selectedIndex = 0;
+            this.chosenLogo = '';
+        }       
+        // Append
+        divLogosChoice.appendChild(labelLogosChoice);
+        divLogosChoice.appendChild(selectLogosChoice);
+
         // Title of the graph
         var divTitleInput = document.createElement('div');
         divTitleInput.className = 'divSmallContainer';
@@ -316,20 +403,33 @@ class manaApp{
         // Merge and display
         this.additionalDiv.appendChild(divVoteChoice);
         this.additionalDiv.appendChild(divCountryChoice);
+        this.additionalDiv.appendChild(divLanguageChoice);
         this.additionalDiv.appendChild(divTitleInput);
-        this.canvaMana = new canvaMana();
+        this.additionalDiv.appendChild(divLogosChoice);
+        this.canvaMana = new canvaMana(this.chosenLanguage);
+        this.canvaMana.titleMana(this.titleText, this.chosenLogo);
         this.createDownload();
-        // Event listeners
+
+        // Event listeners: title management
         inputTitle.addEventListener('input', (e)=>{
-            this.canvaMana.titleMana(e.target.value);
+            this.titleText = e.target.value,
+            this.canvaMana.titleMana(this.titleText, this.chosenLogo);
         });
+
+        // Event Listener logo choice
+        selectLogosChoice.addEventListener('change', (e) => {
+            this.chosenLogo = e.target.value;
+            this.canvaMana.titleMana(this.titleText, this.chosenLogo);
+        });
+
+        // Event listener: select the vote: write the title and the outcome
         selectVoteChoice.addEventListener('change', async (e)=>{
             if(divVoteChoice.getElementsByClassName('divSmallContainer')[0]){
                 divVoteChoice.getElementsByClassName('divSmallContainer')[0].remove();
             }
             this.voteChoice = e.target.value;
             this.outcome = this.getOutcome();
-            this.canvaMana.setAllFooter(e.target.value, this.outcome);
+            this.canvaMana.setAllFooter(e.target.value, this.outcome, this.chosenLanguage);
             // Check if the length of the voteChoice is more than 3 lines
             if(this.canvaMana.checkLengthVoteChoice(e.target.value)){
                 let divInputVoteChoice = document.createElement('div');
@@ -347,17 +447,29 @@ class manaApp{
                 divVoteChoice.appendChild(divInputVoteChoice);
 
                 inputVoteChoice.addEventListener('input', (e)=> {
-                    this.canvaMana.setAllFooter(e.target.value, this.outcome);
+                    this.canvaMana.setAllFooter(e.target.value, this.outcome, this.chosenLanguage);
                 });
             }
             let mergedArray = await this.startMepsLayout();
             this.canvaMana.processMepsLayout(mergedArray);
         });
+
+        // Process when country is chosen
         selectCountryChoice.addEventListener('change', async (e)=> {
             this.countryChoice = e.target.value;
             let mergedArray = await this.startMepsLayout();
             this.canvaMana.processMepsLayout(mergedArray);
         });
+
+        // Event Listener: language
+        selectLanguageChoice.addEventListener('change', (e)=>{
+            this.chosenLanguage = this.language[e.target.value];
+            if(this.voteChoice != null && this.outcome != null){
+                this.canvaMana.setAllFooter(this.voteChoice, this.outcome, this.chosenLanguage);
+            } else {
+                this.canvaMana.footerBlue(this.chosenLanguage);
+            }
+        })
     }
 
     startMepsLayout() {
@@ -403,6 +515,16 @@ class manaApp{
 
                         return 0; // Objects are equal in sorting criteria
                     });
+                    // Get Patrick Breyer first
+                    // Get his vote based on name
+                    let PatrickVote = mergedArray.filter(item => item.Name == "Patrick Breyer");
+                    // If he voted, get him first and wihdraw his vote from the other spot
+                    if(PatrickVote.length > 0){
+                        let index = mergedArray.indexOf(PatrickVote[0]);
+                        mergedArray.splice(index, 1);
+                        mergedArray.unshift(PatrickVote[0]);                     
+                    }
+                    // Resolve with the data
                     resolve(mergedArray);
                 }
             } catch(error) {
@@ -452,13 +574,14 @@ class manaApp{
 
 class canvaMana{
     darkBlue = '#00008B';
-    fontCanvas = 'Courier New';
+    fontCanvas = "Tahoma";
     red = 'red';
     green = 'green';
     orange= 'black';
     grey = 'grey';
+    chosenLogo = '';
 
-    constructor(){
+    constructor(language){
         // Set up the canvas
         this.canvas = document.createElement('canvas');
         this.canvas.width = '1200';
@@ -478,7 +601,7 @@ class canvaMana{
         this.footerHeight = this.canvas.height*0.15;
         this.ctx.imageSmoothingEnabled = true;
         this.headerBlue();
-        this.footerBlue();
+        this.footerBlue(language);
     }
 
     headerBlue() {
@@ -487,25 +610,25 @@ class canvaMana{
         this.ctx.fillRect(0, 0, this.canvas.width, this.headerHeight);
     }
 
-    footerBlue() {
+    footerBlue(language) {
         // Delete and draw the blue rectangle
         this.ctx.clearRect(0, (this.canvas.height-this.footerHeight), this.canvas.width, (this.footerHeight));
         this.ctx.fillStyle = this.darkBlue;
         this.ctx.fillRect(0, (this.canvas.height-this.footerHeight), this.canvas.width, (this.footerHeight));
         // Draw votes indications
-        this.drawVotesIndications();
+        this.drawVotesIndications(language);
     }
 
-    setAllFooter(titleText, outcome) {
-        this.footerBlue();
-        this.writeVote(titleText);
-        this.writeOutcome(outcome);
+    setAllFooter(titleText, outcome, language) {
+        this.footerBlue(language);
+        this.writeVote(titleText, language);
+        this.writeOutcome(outcome, language);
     }
 
     drawLogo(url, coordinates) {
         return new Promise ((resolve, reject) => {
             try {
-                const img = document.createElement('img');
+                const img = new Image();
                 img.src=url;
                 img.onload = () => {
                     this.ctx.drawImage(img, coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
@@ -543,7 +666,7 @@ class canvaMana{
         // Get the font for the name
         let fontName = (realpxPerMep*0.75);
         this.ctx.font = 'bold '+fontName+'px '+this.fontCanvas;
-        let xWidth = ((realColumnWidth)-(logoWidth+logoToTextPadding+realpxPerMep))*0.98;
+        let xWidth = ((realColumnWidth)-(logoWidth+logoToTextPadding+realpxPerMep))*0.95;
         for(let j=0;data.length>j;j++) {
             let name = data[j].Name;
             name = name.toUpperCase();
@@ -615,13 +738,13 @@ class canvaMana{
             }
       }
 
-    writeOutcome(outcome) {
+    writeOutcome(outcome, language) {
         // Write outcome
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'center';
         let outcomeFont = (15*this.canvas.height)/335;
         this.ctx.font = "bold "+ outcomeFont + 'px ' +this.fontCanvas;
-        this.ctx.fillText('OUTCOME', (this.canvas.width*0.88), (this.canvas.height*0.91));
+        this.ctx.fillText(language.OUTCOME, (this.canvas.width*0.88), (this.canvas.height*0.91));
 
         // Get the Y starting position
         let YText = (323*this.canvas.height)/335;
@@ -674,8 +797,8 @@ class canvaMana{
         this.drawCircle(r, XStart, YCircle, 'ABSTENTION');
     }
 
-    writeVote(text) {
-        this.footerBlue();
+    writeVote(text, language) {
+        this.footerBlue(language);
         // Write the vote title
         // Set up ctx
         this.ctx.fillStyle = 'white';
@@ -768,65 +891,101 @@ class canvaMana{
             }
     }
 
-    titleMana(text){
-        // Clear the area and restructure it
-        this.headerBlue();
-        let font = Math.ceil((22*this.headerHeight)/60);
+    async titleMana(text, logo){
+        // Manage the logo if existing
+        // Check if the logo is changing
+        let realLogoWidth = 0;
+        if(logo != "" && this.chosenLogo==logo){
+            let logoHeight = this.headerHeight*0.80;
+            let logoWidth = logoHeight*1.77;
+            realLogoWidth = logoWidth+ this.canvas.width*0.05;
+        }
+        if(this.chosenLogo != logo){
+            // If no logo, then its width is 0
+            this.chosenLogo = logo;
+            // Clear the area
+            this.ctx.fillStyle = this.darkBlue;
+            this.ctx.fillRect(this.canvas.width-(this.headerHeight*0.8*1.77+this.canvas.width*0.05),0, (this.headerHeight*0.8*1.77+this.canvas.width*0.05), this.headerHeight);
+            if(logo != ""){
+                // If a logo then draw it and assign width/height values
+                let logoHeight = this.headerHeight*0.80;
+                let logoWidth = logoHeight*1.77;
+                realLogoWidth = logoWidth+ this.canvas.width*0.05;
+                let XPoint = this.canvas.width - realLogoWidth+ this.canvas.width*0.025;
+                let YPoint = this.headerHeight*0.10;
+                const url = new URL('api/logo?party='+logo+'&width='+Math.floor((logoWidth*100)/100)+'&height='+Math.floor((logoHeight*100)/100), window.location.origin);
+                await this.drawLogo(url, [XPoint, YPoint, logoWidth, logoHeight]);
+            } else {
+                this.headerBlue();
+            }
+        } else {
+            // Only reset the text part
+            this.ctx.clearRect(0, 0, this.canvas.width-(this.headerHeight*0.8*1.77+this.canvas.width*0.05), this.headerHeight);
+            this.ctx.fillStyle = this.darkBlue;
+            this.ctx.fillRect(0, 0, this.canvas.width-(this.headerHeight*0.8*1.77+this.canvas.width*0.05), this.headerHeight);
+        }
+        
+
         // Set up the context
+        let font = Math.ceil((21*this.headerHeight)/60);
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'center';
         this.ctx.font = "bold "+font+'px '+this.fontCanvas;
         // Several lines system: one line is around 93% of the width
-        if(this.ctx.measureText(text).width>(this.canvas.width*(1-0.07))) {
-            // Split the text
-            let splitText = text.split(' ');
-            // Fill as much words as possible in a 320 line, put them in lines array
-            let lines = [];
-            let placeLine = '';
-            // Change font size for sligthly smaller
-
-            for(let j = 0; splitText.length>j; j++) {
-                // Fake line allows comparison without adding the el to the real line
-                let fakeLine = placeLine;
-                if(j == 0) {
-                    fakeLine += splitText[j];
-                } else {
-                    fakeLine += ' ' + splitText[j];
-                }
-                // Check if the text is more than a line
-                if(this.ctx.measureText(fakeLine).width<(this.canvas.width*(1-0.07))) {
+        if(this.ctx.measureText(text.toUpperCase()).width>(this.canvas.width*(1-0.05)-realLogoWidth)) {
+            // Two lines solution
+            this.ctx.font = "bold "+font*0.85+'px '+this.fontCanvas;
+            if(this.ctx.measureText(text.toUpperCase()).width>(this.canvas.width*(1-0.05)-realLogoWidth)){
+                // Split the text
+                let splitText = text.split(' ');
+                // Fill as much words as possible in a 320 line, put them in lines array
+                let lines = [];
+                let placeLine = '';
+                for(let j = 0; splitText.length>j; j++) {
+                    // Fake line allows comparison without adding the el to the real line
+                    let fakeLine = placeLine;
                     if(j == 0) {
-                        placeLine += splitText[j];
+                        fakeLine += splitText[j];
                     } else {
-                        placeLine += ' ' + splitText[j];
+                        fakeLine += ' ' + splitText[j];
                     }
-                } else {
-                    lines.push(placeLine);
-                    placeLine = splitText[j];
+                    // Check if the text is more than a line
+                    if(this.ctx.measureText(fakeLine.toUpperCase()).width<(this.canvas.width*(1-0.05)-realLogoWidth)) {
+                        if(j == 0) {
+                            placeLine += splitText[j];
+                        } else {
+                            placeLine += ' ' + splitText[j];
+                        }
+                    } else {
+                        lines.push(placeLine);
+                        placeLine = splitText[j];
+                    }
+                    // Add the last line
+                    if(splitText.length - 1 == j) {
+                        lines.push(placeLine);
+                    }
                 }
-                // Add the last line
-                if(splitText.length - 1 == j) {
-                    lines.push(placeLine);
+                // Parse the lines array to create a line everytime
+                // px is the starting point of the text vertically, we then add more px for every line
+                let px = 2.4;
+                for(let j = 0; lines.length>j; j++) {
+                    this.ctx.fillText(lines[j].toUpperCase(), ((this.canvas.width-realLogoWidth)/2), this.headerHeight/px);
+                    px = px/1.9;
                 }
+            } else {
+                // One line solution with smaller text
+                this.ctx.fillText(text.toUpperCase(), ((this.canvas.width-realLogoWidth)/2), (((this.headerHeight)/2)+(font/3)));
             }
-            // Parse the lines array to create a line everytime
-            // px is the starting point of the text vertically, we then add more px for every line
-            let px = 2.4;
-            font = font*0.9;
-            this.ctx.font = "bold "+font+'px '+this.fontCanvas;
-            for(let j = 0; lines.length>j; j++) {
-                this.ctx.fillText(lines[j].toUpperCase(), (this.canvas.width/2), this.headerHeight/px);
-                px = px/1.9;
-            }
+            
         }
         // If only one line needed: center
         else {
             this.ctx.font = "bold "+font+'px '+this.fontCanvas;
-            this.ctx.fillText(text.toUpperCase(), (this.canvas.width/2), (((this.headerHeight)/2)+(font/3)));
+            this.ctx.fillText(text.toUpperCase(), ((this.canvas.width-realLogoWidth)/2), (((this.headerHeight)/2)+(font/3)));
         }
     }
 
-    drawVotesIndications() {
+    drawVotesIndications(language) {
         // Basic positioning values
         let r = ((7*this.canvas.width)/600);
         let circlePadding= ((3*this.canvas.width)/600);
@@ -849,10 +1008,10 @@ class canvaMana{
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'left';
         this.ctx.font = "bold "+ ((12*this.canvas.height)/335)+ 'px '+ this.fontCanvas
-        this.ctx.fillText('IN FAVOUR', XStart, YText);
+        this.ctx.fillText(language.FOR, XStart, YText);
 
         // Update XStart
-        XStart += r + postTextMargin + this.ctx.measureText('IN FAVOUR').width;
+        XStart += r + postTextMargin + this.ctx.measureText(language.FOR).width;
         // AGAINST
         this.drawCircle(r, XStart, YCircle, 'AGAINST');
         // Update XStart
@@ -861,10 +1020,10 @@ class canvaMana{
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'left';
         this.ctx.font = "bold "+ ((12*this.canvas.height)/335)+ 'px '+ this.fontCanvas
-        this.ctx.fillText('AGAINST', XStart, YText);
+        this.ctx.fillText(language.AGAINST, XStart, YText);
 
         // Update XStart
-        XStart += r + postTextMargin + this.ctx.measureText('AGAINST').width;
+        XStart += r + postTextMargin + this.ctx.measureText(language.AGAINST).width;
         // ABSTENTION
         this.drawCircle(r, XStart, YCircle, 'ABSTENTION');
         // Update XStart
@@ -873,10 +1032,10 @@ class canvaMana{
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'left';
         this.ctx.font = "bold "+ ((12*this.canvas.height)/335)+ 'px '+ this.fontCanvas
-        this.ctx.fillText('ABSTENTION', XStart, YText);
+        this.ctx.fillText(language.ABSTENTION, XStart, YText);
 
         // Update XStart
-        XStart += r + postTextMargin + this.ctx.measureText('ABSTENTION').width;
+        XStart += r + postTextMargin + this.ctx.measureText(language.ABSTENTION).width;
         // ABSENT
         this.drawCircle(r, XStart, YCircle, 'ABSENT');
         // Update Xstart
@@ -885,7 +1044,7 @@ class canvaMana{
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'left';
         this.ctx.font = "bold "+ ((12*this.canvas.height)/335)+ 'px '+ this.fontCanvas
-        this.ctx.fillText('ABSENT', XStart, YText);
+        this.ctx.fillText(language.ABSENT, XStart, YText);
 
     }
 

@@ -1,0 +1,25 @@
+{
+    "EN" : {
+        "ABSTENTION": "ABSTENTION",
+        "AGAINST": "AGAINST",
+        "ABSENT": "ABSENT",
+        "OUTCOME": "OUTCOME",
+        "FOR": "IN FAVOUR"
+    },
+
+    "DE" : {
+        "ABSTENTION": "ENTHALTUNG",
+        "AGAINST": "ABLEHNUNG",
+        "ABSENT": "ABWESEND",
+        "FOR": "ZUSTIMMUNG",
+        "OUTCOME": "ERGEBNIS"
+    },
+
+    "FR" : {
+        "ABSTENTION": "ABSTENTION",
+        "AGAINST": "CONTRE",
+        "ABSENT": "ABSENT",
+        "OUTCOME": "RÉSULTAT",
+        "FOR": "POUR"
+    }
+}

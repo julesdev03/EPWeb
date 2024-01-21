@@ -17,28 +17,42 @@ def hello():
 def checkVote():
     return render_template('check_vote.html')
 
+@app.route('/api/language')
+def languageAPI():
+    f = open(origin_directory+"language.json")
+    data = json.load(f)
+    return data
+
+@app.route('/api/logos_list')
+def logoListAPI():
+    f = open(origin_directory+"party_logo.json")
+    data = json.load(f)
+    party_names = data.keys()
+    return json.dumps(list(party_names))
+
 @app.route('/api/logo')
 def imgMana():
     args = request.args
+    print(args)
     if args.get('party'):
         f = open(origin_directory+'party_logo.json')
         data = json.load(f)
         try:
             img_path = data[args.get('party')]
             if args.get('width') != None and args.get('height') != None:
-                print('Path:' + 'logos/'+img_path+'.jpg')
+                print('Path:' + 'logos/'+img_path)
                 try:
-                    with Image.open(origin_directory+'logos/'+img_path+'.jpg') as img:
+                    with Image.open(origin_directory+'logos/'+img_path) as img:
                         print('Processing img')
                         img = img.resize((int(args.get('width')), int(args.get('height'))), Image.LANCZOS)
                         img_buffer = BytesIO()
-                        img.save(img_buffer, format='JPEG')
+                        img.save(img_buffer, format='PNG')
                         img_buffer.seek(0)
                         return send_file(img_buffer, mimetype='image/gif')
                 except Exception as error:
                     print(error)
             else:
-                return send_file(origin_directory+'logos/'+img_path+'.jpg', mimetype='image/gif')
+                return send_file(origin_directory+'logos/'+img_path, mimetype='image/gif')
         except:
             image = Image.new('RGB', (600, 335), color='white')
             draw = ImageDraw.Draw(image)
