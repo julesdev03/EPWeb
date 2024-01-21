@@ -8,6 +8,7 @@ class manaApp{
         this.file_uploaded = null;
         this.voteChoice = null;
         this.outcome = null;
+        this.titleText = "";
         this.dataVotes = [];
         this.listVotes = [];
         this.container = document.getElementById('container');
@@ -16,6 +17,7 @@ class manaApp{
         this.getDates();
         this.getCountries();
         this.getLanguage();
+        this.getLogosList();
         this.manageDateInput();
     }
 
@@ -68,6 +70,18 @@ class manaApp{
             this.dateListener();
         }, false);
 
+    }
+
+    async getLogosList(){
+        try{
+            const url = new URL('api/logos_list', window.location.origin);
+            let response = await fetch(url);
+            let data = await response.text();
+            this.logosList = JSON.parse(data);
+            console.log(this.logosList);
+        } catch(error) {
+            console.log(error);
+        }
     }
 
     async getDates(){
@@ -343,6 +357,39 @@ class manaApp{
         divCountryChoice.appendChild(labelCountryChoice);
         divCountryChoice.appendChild(selectCountryChoice);
 
+        // Logos list choice
+        var divLogosChoice = document.createElement('div');
+        divLogosChoice.className = 'divSmallContainer';
+        var labelLogosChoice = document.createElement('label');
+        labelLogosChoice.innerText = 'Choose the logo to be displayed next to the title';
+        var selectLogosChoice = document.createElement('select');
+        // Create html elements
+        for(let i = -1; i < this.logosList.length; i++) {
+            let optionEl = document.createElement('option');
+            // Create an empty option
+            if(i == -1) {
+                optionEl.innerText = ''
+                optionEl.value = ''
+            } else {
+                // Truncate the text in the middle
+                optionEl.innerText = this.logosList[i];
+                optionEl.value = this.logosList[i]
+                optionEl.title = this.logosList[i]
+            }
+            selectLogosChoice.appendChild(optionEl);}
+        // Get Pirates selected as default
+        if(this.logosList.indexOf('European Pirates')) {
+            let indexLogo = this.logosList.indexOf('European Pirates');
+            selectLogosChoice.selectedIndex = indexLogo +1;
+            this.chosenLogo = 'European Pirates';
+        } else {
+            selectLogosChoice.selectedIndex = 0;
+            this.chosenLogo = '';
+        }       
+        // Append
+        divLogosChoice.appendChild(labelLogosChoice);
+        divLogosChoice.appendChild(selectLogosChoice);
+
         // Title of the graph
         var divTitleInput = document.createElement('div');
         divTitleInput.className = 'divSmallContainer';
@@ -358,12 +405,21 @@ class manaApp{
         this.additionalDiv.appendChild(divCountryChoice);
         this.additionalDiv.appendChild(divLanguageChoice);
         this.additionalDiv.appendChild(divTitleInput);
+        this.additionalDiv.appendChild(divLogosChoice);
         this.canvaMana = new canvaMana(this.chosenLanguage);
+        this.canvaMana.titleMana(this.titleText, this.chosenLogo);
         this.createDownload();
 
         // Event listeners: title management
         inputTitle.addEventListener('input', (e)=>{
-            this.canvaMana.titleMana(e.target.value);
+            this.titleText = e.target.value,
+            this.canvaMana.titleMana(this.titleText, this.chosenLogo);
+        });
+
+        // Event Listener logo choice
+        selectLogosChoice.addEventListener('change', (e) => {
+            this.chosenLogo = e.target.value;
+            this.canvaMana.titleMana(this.titleText, this.chosenLogo);
         });
 
         // Event listener: select the vote: write the title and the outcome
@@ -523,6 +579,7 @@ class canvaMana{
     green = 'green';
     orange= 'black';
     grey = 'grey';
+    chosenLogo = '';
 
     constructor(language){
         // Set up the canvas
@@ -571,7 +628,7 @@ class canvaMana{
     drawLogo(url, coordinates) {
         return new Promise ((resolve, reject) => {
             try {
-                const img = document.createElement('img');
+                const img = new Image();
                 img.src=url;
                 img.onload = () => {
                     this.ctx.drawImage(img, coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
@@ -834,19 +891,51 @@ class canvaMana{
             }
     }
 
-    titleMana(text){
-        // Clear the area and restructure it
-        this.headerBlue();
-        let font = Math.ceil((21*this.headerHeight)/60);
+    async titleMana(text, logo){
+        // Manage the logo if existing
+        // Check if the logo is changing
+        let realLogoWidth = 0;
+        if(logo != "" && this.chosenLogo==logo){
+            let logoHeight = this.headerHeight*0.80;
+            let logoWidth = logoHeight*1.77;
+            realLogoWidth = logoWidth+ this.canvas.width*0.05;
+        }
+        if(this.chosenLogo != logo){
+            // If no logo, then its width is 0
+            this.chosenLogo = logo;
+            // Clear the area
+            this.ctx.fillStyle = this.darkBlue;
+            this.ctx.fillRect(this.canvas.width-(this.headerHeight*0.8*1.77+this.canvas.width*0.05),0, (this.headerHeight*0.8*1.77+this.canvas.width*0.05), this.headerHeight);
+            if(logo != ""){
+                // If a logo then draw it and assign width/height values
+                let logoHeight = this.headerHeight*0.80;
+                let logoWidth = logoHeight*1.77;
+                realLogoWidth = logoWidth+ this.canvas.width*0.05;
+                let XPoint = this.canvas.width - realLogoWidth+ this.canvas.width*0.025;
+                let YPoint = this.headerHeight*0.10;
+                const url = new URL('api/logo?party='+logo+'&width='+Math.floor((logoWidth*100)/100)+'&height='+Math.floor((logoHeight*100)/100), window.location.origin);
+                await this.drawLogo(url, [XPoint, YPoint, logoWidth, logoHeight]);
+            } else {
+                this.headerBlue();
+            }
+        } else {
+            // Only reset the text part
+            this.ctx.clearRect(0, 0, this.canvas.width-(this.headerHeight*0.8*1.77+this.canvas.width*0.05), this.headerHeight);
+            this.ctx.fillStyle = this.darkBlue;
+            this.ctx.fillRect(0, 0, this.canvas.width-(this.headerHeight*0.8*1.77+this.canvas.width*0.05), this.headerHeight);
+        }
+        
+
         // Set up the context
+        let font = Math.ceil((21*this.headerHeight)/60);
         this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'center';
         this.ctx.font = "bold "+font+'px '+this.fontCanvas;
         // Several lines system: one line is around 93% of the width
-        if(this.ctx.measureText(text.toUpperCase()).width>(this.canvas.width*(1-0.05))) {
+        if(this.ctx.measureText(text.toUpperCase()).width>(this.canvas.width*(1-0.05)-realLogoWidth)) {
             // Two lines solution
             this.ctx.font = "bold "+font*0.85+'px '+this.fontCanvas;
-            if(this.ctx.measureText(text.toUpperCase()).width>(this.canvas.width*(1-0.05))){
+            if(this.ctx.measureText(text.toUpperCase()).width>(this.canvas.width*(1-0.05)-realLogoWidth)){
                 // Split the text
                 let splitText = text.split(' ');
                 // Fill as much words as possible in a 320 line, put them in lines array
@@ -861,7 +950,7 @@ class canvaMana{
                         fakeLine += ' ' + splitText[j];
                     }
                     // Check if the text is more than a line
-                    if(this.ctx.measureText(fakeLine.toUpperCase()).width<(this.canvas.width*(1-0.05))) {
+                    if(this.ctx.measureText(fakeLine.toUpperCase()).width<(this.canvas.width*(1-0.05)-realLogoWidth)) {
                         if(j == 0) {
                             placeLine += splitText[j];
                         } else {
@@ -880,19 +969,19 @@ class canvaMana{
                 // px is the starting point of the text vertically, we then add more px for every line
                 let px = 2.4;
                 for(let j = 0; lines.length>j; j++) {
-                    this.ctx.fillText(lines[j].toUpperCase(), (this.canvas.width/2), this.headerHeight/px);
+                    this.ctx.fillText(lines[j].toUpperCase(), ((this.canvas.width-realLogoWidth)/2), this.headerHeight/px);
                     px = px/1.9;
                 }
             } else {
                 // One line solution with smaller text
-                this.ctx.fillText(text.toUpperCase(), (this.canvas.width/2), (((this.headerHeight)/2)+(font/3)));
+                this.ctx.fillText(text.toUpperCase(), ((this.canvas.width-realLogoWidth)/2), (((this.headerHeight)/2)+(font/3)));
             }
             
         }
         // If only one line needed: center
         else {
             this.ctx.font = "bold "+font+'px '+this.fontCanvas;
-            this.ctx.fillText(text.toUpperCase(), (this.canvas.width/2), (((this.headerHeight)/2)+(font/3)));
+            this.ctx.fillText(text.toUpperCase(), ((this.canvas.width-realLogoWidth)/2), (((this.headerHeight)/2)+(font/3)));
         }
     }
 
