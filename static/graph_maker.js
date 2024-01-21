@@ -665,8 +665,8 @@ class canvaMana{
 
         // Get the font for the name
         let fontName = (realpxPerMep*0.75);
-        this.ctx.font = 'bold '+fontName+'px '+this.fontCanvas;
-        let xWidth = ((realColumnWidth)-(logoWidth+logoToTextPadding+realpxPerMep))*0.95;
+        this.ctx.font = 'bold '+fontName.toFixed(2)+'px '+this.fontCanvas;
+        let xWidth = ((realColumnWidth)-(logoWidth+logoToTextPadding+realpxPerMep))*0.97;
         for(let j=0;data.length>j;j++) {
             let name = data[j].Name;
             name = name.toUpperCase();
@@ -674,12 +674,13 @@ class canvaMana{
             let lastName = name.pop();
             let firstLetter = name[0].charAt(0);
             let shortName = firstLetter + '.' + lastName;
+            this.ctx.font = 'bold '+fontName.toFixed(2)+'px '+this.fontCanvas;
             if(this.ctx.measureText(shortName).width > xWidth){
-                // Binary search for the optimal font size
+                // Search for the optimal font size
                 var textWidth = this.ctx.measureText(shortName).width;
                 while (textWidth > xWidth) {
                     fontName = fontName*0.99;
-                    this.ctx.font = fontName.toFixed(2) + "px "+this.fontCanvas;
+                    this.ctx.font = "bold "+fontName.toFixed(2) + "px "+this.fontCanvas;
                     textWidth = this.ctx.measureText(shortName).width;
                 }
             }
