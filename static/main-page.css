@@ -1,0 +1,150 @@
+body {
+    margin:0;
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+#container {
+    min-height: 100vh;
+    width: 100vw;
+}
+
+#hero {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#hero-img {
+    height: 100vh;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: url('../20220912-70-years.jpg') top/cover no-repeat;
+    width: 100%;
+    filter: brightness(15%);
+    z-index: -1;
+}
+
+#header {
+    display: flex;
+    align-items: center;
+    height: 80px;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.logo-div {
+    height: 80%;
+    padding-left: clamp(.7rem, 2vw, 3rem);
+}
+
+.logo-div img {
+    height: 100%;
+    width: auto;
+    margin: 0;
+}
+
+.btn {
+    padding: .5rem;
+    font-size: 1.5rem;
+    border: none;
+    border-radius: .2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.blue {
+    background-color: #004aad;
+    color: white;
+}
+
+.blue:hover{
+    background-color: blue;
+}
+
+.white:hover {
+    background-color:lightgray;
+}
+
+.white {
+    background-color: white;
+    color: #004aad;
+}
+
+#header ul {
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: clamp(0.8rem, 1.5vw, 1.5rem);
+    font-weight: bold;
+    margin:0;
+    padding-left: 0;
+    margin-right: clamp(.7rem, 2vw, 3rem);
+    gap: clamp(1rem, 2vw, 3rem);
+}
+
+#header a {
+    color: white;
+}
+
+#hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    padding: 1rem;
+}
+
+#hero-section h1 {
+    color: yellow;
+    font-size: clamp(2.8rem, 7vw, 7rem);
+    max-width: 90%;
+    width: 14ch;
+    margin: 1rem;
+}
+
+#hero-section h2 {
+    color: white;
+    max-width: 90%;
+    width: 50ch;
+    font-weight: normal;
+    margin: 1rem;
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
+}
+
+#hero-section button {
+    margin: 1.5rem;
+}
+
+.arrow {
+    /* height: 30px;
+    width: 60px; */
+    background-color: red;
+    position: absolute;
+    bottom: 1.5rem;
+
+    width: 0;
+  height: 0;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  border-left: 30px solid #007bff;
+  border-right: none;
+}
+
+/* .arrow::before {
+    content: ''; 
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 0 10px 20px; 
+    border-color: transparent transparent transparent #007bff; 
+} */
+
+#services {
+    height: 100vh;
+}
+
