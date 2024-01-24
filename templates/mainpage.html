@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='EU-ASSISTANT.ico')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='main-page.css')}}">
+
+    <title>EU Assistant</title>
+</head>
+<body>
+
+    <div id="container">
+        <div id="hero-container">
+            <div id="hero-img"></div>
+            <div id="hero">
+                <div id="header">
+                    <div class="logo-div"><a href=""><img src="{{url_for('static', filename='EU ASSISTANT.png')}}" alt="LOGO"></a></div>
+                    <ul><li><a href="#">Home</a></li><li><a href="#">About</a></li><li><a href="#services"><button class="btn blue">Services</button></a></li></ul>
+                </div>
+                <div id="hero-section">
+                    <h1>Make the EU more accessible</h1>
+                    <h2>Want to do some shaming, get lost in EU data or discover the EU? You are in the right place.</h2>
+                    <a href="#services"><button class="btn white">Discover</button></a>
+                    <div class="arrow"><a href="#services"></a></div>
+                </div>
+            </div>
+        </div>
+        <div id="services">
+            <h1>Our services</h1>
+            <div class="grid">
+                <div class="grid-element">
+                    <h1>EP GRAPH MAKER</h1>
+                    <img src="{{url_for('static', filename='graph(10).png')}}" alt="graph">
+                    <p>Make graphics out of the votes in European Parliament plenary based on your country. You can publish them on your social media.</p>
+                    <button class="btn blue"><a href="graph">Discover</a></button>
+                </div>
+                <div class="grid-element">
+                    <h1>DID YOUR MEP VOTE CORRECTLY?</h1>
+                    <img src="{{url_for('static', filename='vote_check.jpg')}}" alt="vote_check">
+                    <p>You can verify if your MEP voted according to the majority of its group and check for any mistakes.</p>
+                    <button class="btn blue"><a href="check_vote">Discover</a></button>
+                </div>
+            </div>
+        </div>
+
+        
+        
+        
+    </div>
+    
+</body>
+</html>

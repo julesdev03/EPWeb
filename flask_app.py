@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return 'Hello, World!l'
+    return render_template('mainpage.html')
 
 @app.route('/check_vote')
 def checkVote():
