@@ -3,25 +3,37 @@ body {
     font-family: Tahoma, Arial, Helvetica, sans-serif;
 }
 
+html {
+    scroll-behavior:smooth;
+}
+
 #container {
     min-height: 100vh;
-    width: 100vw;
+}
+
+#hero-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 #hero {
-    height: 100vh;
     width: 100%;
     display: flex;
     flex-direction: column;
 }
 
+#hero button {
+    font-size: 1.5rem;
+    margin-bottom: 3rem;
+}
+
 #hero-img {
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100%;
     position: absolute;
     top: 0;
     left: 0;
-    background: url('../20220912-70-years.jpg') top/cover no-repeat;
+    background: url("20220912-70-years.jpg") top/cover no-repeat;
     width: 100%;
     filter: brightness(15%);
     z-index: -1;
@@ -48,7 +60,6 @@ body {
 
 .btn {
     padding: .5rem;
-    font-size: 1.5rem;
     border: none;
     border-radius: .2rem;
     font-weight: bold;
@@ -90,6 +101,11 @@ body {
     color: white;
 }
 
+#header li a button {
+    font-size: clamp(1rem, 2vw, 3rem);
+    margin: 0;
+}
+
 #hero-section {
     display: flex;
     flex-direction: column;
@@ -100,8 +116,8 @@ body {
 }
 
 #hero-section h1 {
-    color: yellow;
-    font-size: clamp(2.8rem, 7vw, 7rem);
+    color: #fcdc5a;
+    font-size: clamp(2.8rem, 6vw, 7rem);
     max-width: 90%;
     width: 14ch;
     margin: 1rem;
@@ -113,38 +129,108 @@ body {
     width: 50ch;
     font-weight: normal;
     margin: 1rem;
-    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    font-size: clamp(1.2rem, 2vw, 2rem);
 }
 
 #hero-section button {
-    margin: 1.5rem;
+    margin: 2rem;
 }
 
 .arrow {
-    /* height: 30px;
-    width: 60px; */
-    background-color: red;
+    height: 50px;
+    width: 70px;
+    /* background-color: red; */
     position: absolute;
-    bottom: 1.5rem;
-
-    width: 0;
-  height: 0;
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent;
-  border-left: 30px solid #007bff;
-  border-right: none;
+    bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-/* .arrow::before {
-    content: ''; 
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 10px 0 10px 20px; 
-    border-color: transparent transparent transparent #007bff; 
-} */
+.arrow::before,
+.arrow::after {
+    position: absolute;
+    content: '';
+    width: 62%;
+    height: 15px; /* cross thickness */
+    background-color: white;
+}
+
+.arrow::before {
+    transform: rotate(37deg);
+    left: 0;
+}
+
+.arrow::after {
+    right: 0;
+    transform: rotate(-37deg);
+}
 
 #services {
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+#services > h1 {
+    font-size: clamp(2.8rem, 5vw, 7rem);
+    color: #004aad;
+    margin: 1rem;
+}
+
+.grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2rem;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.grid-element {
+    background-color: white;
+    height: 90%;
+    min-height: 30rem;
+    width: clamp(18rem, 30vw, 50rem);
+    border-radius: 1.5rem;
+    box-shadow: grey .1rem .1rem .1rem;
+    border: solid .1rem lightgray;
+    color: black;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.grid-element > h1 {
+    font-size: 2rem;
+}
+
+.grid-element > img {
+    border: none;
+    width: 85%;
+    max-height: 40%;
+    object-fit: cover;
+}
+
+.grid-element > p {
+    width: 75%;
+    text-align: justify;
+}
+
+.grid-element button {
+    font-size: 1.5rem;
+    position: absolute;
+    bottom: 1rem;
+}
+
+.grid-element a {
+    text-decoration: none;
+    color: white;
+}
