@@ -13,6 +13,11 @@ app = Flask(__name__)
 def hello():
     return render_template('mainpage.html')
 
+# Route for assistants per meps
+@app.route('/assistants')
+def MepsAssistants():
+    return render_template('meps_assistants.html') 
+
 @app.route('/check_vote')
 def checkVote():
     return render_template('check_vote.html')
@@ -33,7 +38,6 @@ def logoListAPI():
 @app.route('/api/logo')
 def imgMana():
     args = request.args
-    print(args)
     if args.get('party'):
         f = open(origin_directory+'party_logo.json')
         data = json.load(f)
@@ -98,6 +102,16 @@ def datesAPI():
 def countriesAPI():
     mana = DBMana(data_name="list_countries")
     return mana.csvToJson()
+
+@app.route('/api/assistants_data')
+def assistantsAPI():
+    args = request.args
+    if args.get('type') == 'total':
+        mana = DBMana(data_name="total_stats")
+        return mana.csvToJson()
+    else:
+        mana = DBMana(data_name="stats_meps")
+        return mana.csvToJson()
 
 if __name__ == '__main__':
     app.run()

@@ -66,6 +66,9 @@ class DBMana():
         elif self.data_name == 'list_countries':
             df = df1['Country'].values.tolist()
             return json.dumps(df)
+        else:
+            df = df1.to_dict(orient='records')
+            return json.dumps(df)
 
     def csvToDf(self):
         return pd.read_csv(origin_directory+self.data_name + '.csv')
