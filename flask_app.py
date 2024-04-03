@@ -123,6 +123,8 @@ def assistantsMep(PersId):
     for el in data:
         if int(el['PersId']) == int(PersId):
             mep = el
+            if mep['LeaveDate'] == '2024-07-02':
+                mep['LeaveDate'] = 'ongoing'
     
     # Get individual assistants
     assistants_data = {'accredited':[], "local": [], "accredited assistants (grouping)":[], "local assistants (grouping)":[]}
