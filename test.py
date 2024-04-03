@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import math
 import json
-
+from scrap_assistants import testIfRemainingDate, list_type_assistant
 
 def mepsStats():
     # Total stats
@@ -30,7 +30,8 @@ def mepsStats():
             days = timedelta(0)
             count = 0
             for i, line in meps_assistants.iterrows():
-                days += datetime.strptime(line['LeaveDate'], '%Y-%m-%d') - datetime.strptime(line['EntryDate'], '%Y-%m-%d')
+                print(line['Name'])
+                days += datetime.strptime(str(line['LeaveDate']), '%Y-%m-%d') - datetime.strptime(str(line['EntryDate']), '%Y-%m-%d')
                 count+=1
                 # Total stats
                 totalStats[type_assistant]['NbAssistants'] += 1
@@ -71,5 +72,6 @@ def mepsStats():
     df_meps_stats.fillna(0, inplace=True)
     df_meps_stats.to_csv('stats_meps.csv', index=False)
 
-
+for el in list_type_assistant:
+    testIfRemainingDate(el)
 mepsStats()

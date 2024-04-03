@@ -113,5 +113,29 @@ def assistantsAPI():
         mana = DBMana(data_name="stats_meps")
         return mana.csvToJson()
 
+@app.route('/assistants/mep/<int:PersId>')
+def assistantsMep(PersId):
+    origin = "9_"
+    # Get basic MEPs data
+    mana = DBMana('stats_meps')
+    data = mana.csvToJson()
+    data = json.loads(data)
+    for el in data:
+        if int(el['PersId']) == int(PersId):
+            mep = el
+    
+    # Get individual assistants
+    assistants_data = {'accredited':[], "local": [], "accredited assistants (grouping)":[], "local assistants (grouping)":[]}
+    for el in assistants_data.keys():
+        mana = DBMana(origin+el)
+        df = mana.csvToDf()
+        df = df[(df['PersId'] == int(PersId))]
+        dictionary = df.to_dict(orient='records')
+        for els in dictionary:
+            if els['LeaveDate'] == datetime.today().strftime('%Y-%m-%d'):
+                els['LeaveDate'] = 'ongoing'
+        assistants_data[el] = dictionary
+    return render_template('mep_APA.html', mep=mep, data=assistants_data)
+
 if __name__ == '__main__':
     app.run()

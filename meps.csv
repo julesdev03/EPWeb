@@ -1,4 +1,14 @@
 PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
+124785,Maria Grapini,S&D,Romania,Partidul Social Democrat,2024-07-02,2019-06-02
+130833,Stelios Kouloglou,The Left,Greece,New Left,2024-07-02,2019-06-02
+232843,Jan Ovelgönne,Greens/EFA,Germany,Bündnis 90/Die Grünen,2024-07-02,2024-03-12
+28586,Dimitrios Papadimoulis,The Left,Greece,New Left,2024-07-02,2019-06-02
+197791,Massimiliano Smeriglio,NI,Italy,Alleanza Verdi e Sinistra,2024-07-02,2019-06-02
+96867,Maria Da Graça Carvalho,EPP,Portugal,Partido Social Democrata,2024-04-01,2019-07-02
+96899,José Manuel Fernandes,EPP,Portugal,Partido Social Democrata,2024-04-01,2019-07-02
+96903,Paulo Rangel,EPP,Portugal,Partido Social Democrata,2024-04-01,2019-07-02
+96820,Marisa Matias,The Left,Portugal,Bloco de Esquerda,2024-03-25,2019-07-02
+96978,Nuno Melo,EPP,Portugal,Partido do Centro Democrático Social-Partido Popular,2024-03-25,2019-07-02
 229352,Malte Gallée,NI,Germany,Bündnis 90/Die Grünen,2024-03-10,2021-12-22
 197657,Tudor Ciuhodaru,NI,Romania,Alianța pentru Unirea Românilor,2024-07-02,2019-06-02
 197418,Monica Semedo,Renew,Luxembourg,Fokus,2024-07-02,2019-06-02
@@ -128,7 +138,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 197574,Damien Carême,Greens/EFA,France,Europe Écologie,2024-07-02,2019-06-02
 250572,Patricia Caro Maya,The Left,Spain,PODEMOS,2024-07-02,2023-11-30
 199996,Isabel Carvalhais,S&D,Portugal,Partido Socialista,2024-07-02,2019-09-03
-96867,Maria Da Graça Carvalho,EPP,Portugal,Partido Social Democrata,2024-07-02,2019-06-02
 28122,David Casa,EPP,Malta,Partit Nazzjonalista,2024-07-02,2019-06-02
 197796,Massimo Casanova,ID,Italy,Lega,2024-07-02,2019-06-02
 28219,Daniel Caspary,EPP,Germany,Christlich Demokratische Union Deutschlands,2024-07-02,2019-06-02
@@ -208,7 +217,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 197649,Gheorghe Falcă,EPP,Romania,Partidul Naţional Liberal,2024-07-02,2019-06-02
 197589,Laurence Farreng,Renew,France,Mouvement Démocrate,2024-07-02,2019-06-02
 1917,Markus Ferber,EPP,Germany,Christlich-Soziale Union in Bayern e.V.,2024-07-02,2019-06-02
-96899,José Manuel Fernandes,EPP,Portugal,Partido Social Democrata,2024-07-02,2019-06-02
 125046,Jonás Fernández,S&D,Spain,Partido Socialista Obrero Español,2024-07-02,2019-06-02
 192634,Giuseppe Ferrandino,Renew,Italy,Azione,2024-07-02,2019-06-02
 124833,Laura Ferrara,NI,Italy,Movimento 5 Stelle,2024-07-02,2019-06-02
@@ -256,7 +264,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 204419,Sandro Gozi,Renew,France,Liste Renaissance,2024-07-02,2020-02-01
 125025,Marcel De Graaff,NI,Netherlands,Forum voor Democratie,2024-07-02,2020-02-01
 197799,Valentino Grant,ID,Italy,Lega,2024-07-02,2019-06-02
-124785,Maria Grapini,S&D,Romania,Partidul Umanist Social Liberal,2024-07-02,2019-06-02
 197549,Markéta Gregorová,Greens/EFA,Czechia,PIRÁTI,2024-07-02,2019-06-02
 94649,Catherine Griset,ID,France,Rassemblement national,2024-07-02,2019-06-02
 197780,Bart Groothuis,Renew,Netherlands,Volkspartij voor Vrijheid en Democratie,2024-07-02,2020-02-01
@@ -351,7 +358,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 197445,Moritz Körner,Renew,Germany,Freie Demokratische Partei,2024-07-02,2019-06-02
 96829,Ádám Kósa,NI,Hungary,Fidesz-Magyar Polgári Szövetség-Kereszténydemokrata Néppárt,2024-07-02,2019-06-02
 124822,Dietmar Köster,S&D,Germany,Sozialdemokratische Partei Deutschlands,2024-07-02,2019-06-02
-130833,Stelios Kouloglou,The Left,Greece,Independent,2024-07-02,2019-06-02
 197699,Elena Kountoura,The Left,Greece,Coalition of the Radical Left,2024-07-02,2019-06-02
 118949,Ondřej Kovařík,Renew,Czechia,ANO 2011,2024-07-02,2019-06-02
 97968,Andrey Kovatchev,EPP,Bulgaria,Citizens for European Development of Bulgaria,2024-07-02,2019-06-02
@@ -414,7 +420,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 197634,Pedro Marques,S&D,Portugal,Partido Socialista,2024-07-02,2019-06-02
 124828,Fulvio Martusciello,EPP,Italy,Forza Italia,2024-07-02,2019-06-02
 249285,Lydie Massard,Greens/EFA,France,Régions et Peuples Solidaires,2024-07-02,2023-09-24
-96820,Marisa Matias,The Left,Portugal,Bloco de Esquerda,2024-07-02,2019-06-02
 197441,Predrag Fred Matić,S&D,Croatia,Socijaldemokratska partija Hrvatske,2024-07-02,2019-06-02
 96936,Gabriel Mato,EPP,Spain,Partido Popular,2024-07-02,2020-02-01
 208722,Sara Matthieu,Greens/EFA,Belgium,Groen,2024-07-02,2020-10-08
@@ -429,7 +434,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 197662,Vangelis Meimarakis,EPP,Greece,Nea Demokratia,2024-07-02,2019-06-02
 130256,Dace Melbārde,EPP,Latvia,"Partija ""VIENOTĪBA""",2024-07-02,2019-06-02
 197567,Karen Melchior,Renew,Denmark,Independent,2024-07-02,2019-06-02
-96978,Nuno Melo,EPP,Portugal,Partido do Centro Democrático Social-Partido Popular,2024-07-02,2019-06-02
 236053,Marina Mesure,The Left,France,La France Insoumise,2024-07-02,2022-07-29
 118859,Roberta Metsola,EPP,Malta,Partit Nazzjonalista,2024-07-02,2019-06-02
 193292,Tilly Metz,Greens/EFA,Luxembourg,Déi Gréng - Les Verts,2024-07-02,2019-06-02
@@ -490,7 +494,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 99283,Alessandro Panza,ID,Italy,Lega,2024-07-02,2019-06-02
 124692,Demetris Papadakis,S&D,Cyprus,Movement for Social Democracy EDEK,2024-07-02,2019-06-02
 125093,Kostas Papadakis,NI,Greece,Communist Party of Greece,2024-07-02,2019-06-02
-28586,Dimitrios Papadimoulis,The Left,Greece,Independent,2024-07-02,2019-06-02
 244571,Nikos Papandreou,S&D,Greece,PASOK-KINAL,2024-07-02,2023-05-03
 197466,Jutta Paulus,Greens/EFA,Germany,Bündnis 90/Die Grünen,2024-07-02,2019-06-02
 124844,Piernicola Pedicini,Greens/EFA,Italy,Independent,2024-07-02,2019-06-02
@@ -531,7 +534,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 188945,Dennis Radtke,EPP,Germany,Christlich Demokratische Union Deutschlands,2024-07-02,2019-06-02
 197868,Samira Rafaela,Renew,Netherlands,Democraten 66,2024-07-02,2019-06-02
 197544,Elżbieta Rafalska,ECR,Poland,Prawo i Sprawiedliwość,2024-07-02,2019-06-02
-96903,Paulo Rangel,EPP,Portugal,Partido Social Democrata,2024-07-02,2019-06-02
 96998,Evelyn Regner,S&D,Austria,Sozialdemokratische Partei Österreichs,2024-07-02,2019-06-02
 197488,Guido Reil,ID,Germany,Alternative für Deutschland,2024-07-02,2019-06-02
 103381,Terry Reintke,Greens/EFA,Germany,Bündnis 90/Die Grünen,2024-07-02,2019-06-02
@@ -594,7 +596,6 @@ PersId,Name,EuParty,Country,NationalParty,LeaveDate,EntryDate
 197935,Ivan Vilibor Sinčić,NI,Croatia,KLJUČ Hrvatske,2024-07-02,2019-06-02
 96932,Birgit Sippel,S&D,Germany,Sozialdemokratische Partei Deutschlands,2024-07-02,2019-06-02
 197849,Andrey Slabakov,ECR,Bulgaria,VMRO,2024-07-02,2019-06-02
-197791,Massimiliano Smeriglio,S&D,Italy,Partito Democratico,2024-07-02,2019-06-02
 204334,Vincenzo Sofo,ECR,Italy,Fratelli d'Italia,2024-07-02,2020-02-01
 124710,Michaela Šojdrová,EPP,Czechia,Křesťanská a demokratická unie - Československá strana lidová,2024-07-02,2019-06-02
 197417,Tomislav Sokol,EPP,Croatia,Hrvatska demokratska zajednica,2024-07-02,2019-06-02

@@ -1,9 +1,12 @@
 from datetime import datetime
 import pandas as pd
+import numpy as np
 import json
 import requests
 import os
 from global_variables import origin_directory, testing_directory
+from datetime import datetime, timedelta
+import math
 
 file_extracted = 'meps_parltrack'
 url_download_parltrack_meps = 'https://parltrack.org/dumps/ep_meps.json.lz'
@@ -387,37 +390,8 @@ def testIfRemainingDate(type_assistant):
     df = pd.read_csv('9_'+type_assistant+'.csv')
     locate_bis = df.loc[(df['EntryDate'].isna()) | (df['LeaveDate'].isna())]
     locate_bis.to_csv(origin_directory + testing_directory + 'remaining_'+type_assistant+'.csv', index=False)
-
-def mepsStats():
-    df_meps_stats = pd.DataFrame(columns=['Name', 'EntryDate', 'LeaveDate', 'PersId', 'accredited', 'accredited assistants (grouping)', 'local', 'local assistants (grouping)'])
-    df_meps = pd.read_csv('meps.csv')
-    # Parse for all assistants types
-    for type_assistant in list_type_assistant:
-        # Create a df based on assistant type
-        df = pd.read_csv('9_'+type_assistant+'.csv')
-        # Get a list of PersId in the table
-        listPersId = df['PersId'].unique()
-        # Parse all MEPs
-        for PersId in listPersId:
-            # Get the info about the mep
-            reference_mep = df_meps.loc[(df_meps['PersId'] == PersId)]
-            # Get the number of assistants
-            number_assistants = len(df.loc[(df['PersId'] == PersId)])
-            # If line not alreay existing, create it
-            if len(df_meps_stats.loc[(df_meps_stats['PersId'] == PersId)]) == 0:
-                dic_placeholder = {'Name':reference_mep['Name'].to_list()[0], 'EuParty': reference_mep['EuParty'].to_list()[0], 'NationalParty': reference_mep['NationalParty'].to_list()[0], 'EntryDate':reference_mep['EntryDate'].to_list()[0], 'LeaveDate':reference_mep['LeaveDate'].to_list()[0], 'PersId':PersId, 'accredited':0, 'accredited assistants (grouping)':0, 'local':0, 'local assistants (grouping)':0}
-                # Add them to the dictionary
-                dic_placeholder[type_assistant] = number_assistants
-                # Add to the df about meps data
-                if not df_meps_stats.empty:
-                    df_meps_stats = pd.concat([df_meps_stats, pd.DataFrame(dic_placeholder,index=[0])], ignore_index=True)
-                else:
-                    df_meps_stats = pd.DataFrame(dic_placeholder,index=[0])
-            # If line existing change the appropriate value
-            else:
-                df_meps_stats.loc[df_meps_stats.loc[(df_meps_stats['PersId'] == PersId)].index, [type_assistant]] = number_assistants
-    
-    df_meps_stats.to_csv(origin_directory+'stats_meps.csv', index=False)
+    df = df.dropna()
+    df.to_csv('9_'+type_assistant+'.csv')
 
 def downloadAndExtract():
     # Download
@@ -429,23 +403,6 @@ def downloadAndExtract():
         os.system('lzip -d '+origin_directory+file_extracted+'.lz --output='+origin_directory+file_extracted+'.json')
     except:
         pass
-
-def scrap_assistants():
-    print('DOWNLOADING...')
-    downloadAndExtract()
-    list_persid = extractPersId(returnMeps())
-    process_json_file(file_extracted+'.json', list_persid)
-    for type_assistant in list_type_assistant:
-        print("PROCESSING...")
-        firstProcessing(type_assistant)
-        print('TESTING...')
-        testIfRemainingDate(type_assistant)
-    print('STATS...')
-    mepsStats()
-    # Remove files
-    os.remove(origin_directory+file_extracted+'.lz')
-    os.remove(origin_directory+file_extracted+'.json')
-    os.remove(origin_directory+json_data_file)
 
 def mepsStats():
     # Total stats
@@ -513,3 +470,20 @@ def mepsStats():
     # Df to csv
     df_meps_stats.fillna(0, inplace=True)
     df_meps_stats.to_csv('stats_meps.csv', index=False)
+
+def scrap_assistants():
+    print('DOWNLOADING...')
+    downloadAndExtract()
+    list_persid = extractPersId(returnMeps())
+    process_json_file(file_extracted+'.json', list_persid)
+    for type_assistant in list_type_assistant:
+        print("PROCESSING...")
+        firstProcessing(type_assistant)
+        print('TESTING...')
+        testIfRemainingDate(type_assistant)
+    print('STATS...')
+    mepsStats()
+    # Remove files
+    os.remove(origin_directory+file_extracted+'.lz')
+    os.remove(origin_directory+file_extracted+'.json')
+    os.remove(origin_directory+json_data_file)

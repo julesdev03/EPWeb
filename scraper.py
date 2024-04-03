@@ -21,4 +21,3 @@ def mep_scraper():
 date_scraper()
 mep_scraper()
 scrap_assistants()
-mepsStats()
