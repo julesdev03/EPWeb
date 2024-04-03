@@ -84,7 +84,7 @@ class manaApp{
           }
           // Check if it is a plenary date
           var date;
-          date = this.year + '-'+this.month+'-'+ + this.day;
+          date = this.year + '-'+this.month+'-'+ this.day;
           this.date = date;
           if(this.dates_list.includes(this.date)){
             if(document.getElementById('zoneDrop')){

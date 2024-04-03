@@ -1,0 +1,109 @@
+body {
+    margin: 0;
+}
+
+.btn {
+    padding: .5rem;
+    border: none;
+    border-radius: .2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.blue {
+    background-color: #004aad;
+    color: white;
+}
+
+.blue:hover{
+    background-color: blue;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100dvh;
+    gap: 2rem;
+}
+
+#table-outcome {
+    width: 95%;
+}
+
+th {
+    border-bottom: solid 1px grey;
+    text-align: center;
+    flex-wrap: wrap;
+}
+
+td {
+    text-align: center;
+    border-bottom: solid 0.5px grey;
+}
+
+.arrow-div {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    color: aliceblue;
+    background-color: lightgray;
+
+}
+
+.arrow-div:hover, .arrow-up:hover {
+    background-color: lightgreen;
+    cursor: pointer;
+}
+
+.arrow-div::after, .arrow-up:hover::after {
+    content: '↓';
+    color: aliceblue;
+}
+
+.arrow-down {
+    background-color: green;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    color: aliceblue;
+}
+
+.arrow-down::after {
+    content: '↓';
+    color: aliceblue;
+}
+
+.arrow-down:hover {
+    background-color: lightcoral;
+    cursor: pointer;
+}
+
+.arrow-up::after {
+    content: '↑';
+    color: aliceblue;
+}
+
+.arrow-down:hover::after {
+    content: '↑';
+    color: aliceblue;
+}
+
+.arrow-up {
+    background-color: red;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    color: aliceblue;
+}

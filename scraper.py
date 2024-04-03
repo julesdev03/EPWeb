@@ -1,6 +1,7 @@
 from db_manager import DBMana
 from scrap_meps import ScrapMep
 from scrap_dates import ScrapDates
+from scrap_assistants import scrap_assistants, mepsStats
 
 
 def date_scraper():
@@ -19,3 +20,4 @@ def mep_scraper():
 
 date_scraper()
 mep_scraper()
+scrap_assistants()
