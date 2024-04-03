@@ -46,7 +46,7 @@ def mepsStats():
                 # Add them to the dictionary
                 dic_placeholder[type_assistant] = number_assistants
                 # Add the average stay
-                dic_placeholder['Avg_'+type_assistant] = average_days
+                dic_placeholder['Avg_days_'+type_assistant] = average_days
                 # Add to the df about meps data
                 if not df_meps_stats.empty:
                     df_meps_stats = pd.concat([df_meps_stats, pd.DataFrame(dic_placeholder,index=[0])], ignore_index=True)
@@ -55,7 +55,7 @@ def mepsStats():
             # If line existing change the appropriate value
             else:
                 df_meps_stats.loc[df_meps_stats.loc[(df_meps_stats['PersId'] == PersId)].index, [type_assistant]] = number_assistants
-                df_meps_stats.loc[df_meps_stats.loc[(df_meps_stats['PersId'] == PersId)].index, ['Avg_'+type_assistant]] = average_days
+                df_meps_stats.loc[df_meps_stats.loc[(df_meps_stats['PersId'] == PersId)].index, ['Avg_days_'+type_assistant]] = average_days
     # Total stats to json
     df_total = []
     for els in totalStats.keys():
