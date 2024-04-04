@@ -42,7 +42,7 @@ class manaApp {
 
 		// Get the arrow down
 		let trConcerned = document.getElementById('arrows-tr');
-		let el = trConcerned.firstElementChild;
+		let el = trConcerned.firstElementChild.firstElementChild;
 		el.firstElementChild.className = "arrow-down";
 
 		// Downloader
@@ -68,32 +68,36 @@ class manaApp {
 		// Add event listener to the arrows
 		let trConcerned = document.getElementById('arrows-tr');
 		Array.from(trConcerned.children).forEach((el) => {
-			Array.from(el.children).forEach((child) => {
-				child.addEventListener('click', e => {
-					// Get the relevant values: class and value in order to do the sorting and changing to relevant classname
-					let classTarget = e.target.className;
-					let valueTarget = e.target.dataset.info;
-
-					// Reset all classes
-					Array.from(trConcerned.children).forEach((element) => {
-						Array.from(element.children).forEach((div) => {
-							div.className = "arrow-div";
+			Array.from(el.children).forEach((child) => { 
+				Array.from(child.children).forEach((divs) => {
+					divs.addEventListener('click', e => {
+						// Get the relevant values: class and value in order to do the sorting and changing to relevant classname
+						let classTarget = e.target.className;
+						let valueTarget = e.target.dataset.info;
+	
+						// Reset all classes
+						Array.from(trConcerned.children).forEach((element) => {
+							Array.from(element.children).forEach((divContainer) => {
+								Array.from(divContainer.children).forEach((div) => {
+									div.className = "arrow-div";								
+								});
+							});
 						});
-					});
-
-					// Set class for this one
-					let order = 'ascending';
-					if (classTarget == "arrow-div" || classTarget == "arrow-up") {
-						e.target.className = "arrow-down";
-						order = "descending"
-					}
-					if (classTarget == "arrow-down") {
-						e.target.className = "arrow-up";
-						order = "ascending"
-					}
-
-					this.displayTable(valueTarget, order);
-
+	
+						// Set class for this one
+						let order = 'ascending';
+						if (classTarget == "arrow-div" || classTarget == "arrow-up") {
+							e.target.className = "arrow-down";
+							order = "descending"
+						}
+						if (classTarget == "arrow-down") {
+							e.target.className = "arrow-up";
+							order = "ascending"
+						}
+	
+						this.displayTable(valueTarget, order);	
+				});
+				
 				});
 			})
 		});
@@ -127,8 +131,9 @@ class manaApp {
 			let EuGroup = mep.EuParty;
 			let EntryDate = mep.EntryDate;
 			let LeaveDate = mep.LeaveDate;
+			let Country = mep.Country;
 			// Add to the MEP column the elements
-			mepName.innerHTML = `<a href=${url}>${MepName}</a><p>${EuGroup}</p><p>${EntryDate} - ${LeaveDate}</p>`
+			mepName.innerHTML = `<a href=${url}><b>${MepName}</b></a><p>${EuGroup}</p><p>${Country}</p><p>${EntryDate} - ${LeaveDate}</p>`
 			line.appendChild(mepName);
 			
 			// Add all stats
