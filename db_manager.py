@@ -45,14 +45,14 @@ class DBMana():
             # Add or update based on the PersId
             if self.data_name == 'meps':
                 final_df = pd.concat([isFalse,df1]).drop_duplicates(['PersId'], keep='first')
-                final_df.to_csv(self.data_name+'.csv', index=False)
+                final_df.to_csv(origin_directory+self.data_name+'.csv', index=False)
             if self.data_name == 'dates':
                 final_df = pd.concat([isFalse, df1])
-                final_df.to_csv(self.data_name+'.csv', index=False)
+                final_df.to_csv(origin_directory+self.data_name+'.csv', index=False)
 
         else:
             df = pd.DataFrame().from_records(self.data)
-            df.to_csv(self.data_name+'.csv', index=False)
+            df.to_csv(origin_directory+self.data_name+'.csv', index=False)
 
     def csvToJson(self):
             # Get csv
@@ -72,6 +72,9 @@ class DBMana():
 
     def csvToDf(self):
         return pd.read_csv(origin_directory+self.data_name + '.csv')
+    
+    def dfToCsv(self):
+        self.data.to_csv(origin_directory+self.data_name+'.csv', index=False)
 
 
 

@@ -7,6 +7,7 @@ import os
 from global_variables import origin_directory, testing_directory
 from datetime import datetime, timedelta
 import math
+from db_manager import DBMana
 
 file_extracted = 'meps_parltrack'
 url_download_parltrack_meps = 'https://parltrack.org/dumps/ep_meps.json.lz'
@@ -17,7 +18,7 @@ json_data_file = 'meps_data.json'
 list_type_assistant = ["accredited", "local", "accredited assistants (grouping)", "local assistants (grouping)"]
 
 def returnMeps():
-    df = pd.read_csv(origin_directory+'meps.csv')
+    df = DBMana('meps').csvToDf()
     list_dic = df.to_dict(orient='records')
     return list_dic
 
@@ -216,9 +217,9 @@ def removeDoubles(data):
 def firstProcessing(type_assistant):
     final_data = pd.DataFrame(columns=['Name', 'EntryDate', 'LeaveDate', 'PersId'])
     # Process the data from the json
-    with open(json_data_file, 'r') as f:
+    with open(origin_directory+json_data_file, 'r') as f:
         data = json.load(f)
-        data_meps = pd.read_csv(origin_directory+'meps.csv')
+        data_meps = DBMana('meps').csvToDf()
         # Process each mep individually
         for mep in data:
             temp_df = pd.DataFrame(columns=['Name', 'EntryDate', 'LeaveDate', 'PersId'])
@@ -382,16 +383,19 @@ def firstProcessing(type_assistant):
             except OSError as e:
                 print(e)
 
-        final_data.to_csv(origin_directory+'9_'+type_assistant+".csv", index=False)
+        DBMana(data_name='9_'+type_assistant, data=final_data).dfToCsv()
+        # final_data.to_csv(origin_directory+'9_'+type_assistant+".csv", index=False)
 
         
 def testIfRemainingDate(type_assistant):
     # Put in a csv format assistants with no entry or leave date
-    df = pd.read_csv('9_'+type_assistant+'.csv')
+    df = DBMana('9_'+type_assistant).csvToDf()
     locate_bis = df.loc[(df['EntryDate'].isna()) | (df['LeaveDate'].isna())]
-    locate_bis.to_csv(origin_directory + testing_directory + 'remaining_'+type_assistant+'.csv', index=False)
+    DBMana(data_name=testing_directory + 'remaining_'+type_assistant, data=locate_bis).dfToCsv()
+    # locate_bis.to_csv(origin_directory + testing_directory + 'remaining_'+type_assistant+'.csv', index=False)
     df = df.dropna()
-    df.to_csv('9_'+type_assistant+'.csv')
+    DBMana(data_name='9_'+type_assistant, data=df).dfToCsv()
+    # df.to_csv(origin_directory+'9_'+type_assistant+'.csv')
 
 def downloadAndExtract():
     # Download
@@ -401,21 +405,22 @@ def downloadAndExtract():
     # Extract
     try:
         os.system('lzip -d '+origin_directory+file_extracted+'.lz --output='+origin_directory+file_extracted+'.json')
-    except:
-        pass
+    except OSError as e:
+        print(e)
 
 def mepsStats():
     # Total stats
     totalStats = {}
     # Open files
     df_meps_stats = pd.DataFrame(columns=['PersId'])
-    df_meps = pd.read_csv('meps.csv')
+    df_meps = DBMana('meps').csvToDf()
     # Parse for all assistants types
     for type_assistant in ["accredited", "local", "accredited assistants (grouping)", "local assistants (grouping)"]:
         # Total stats
         totalStats[type_assistant] = {'NbAssistants':0,'DaysAssistants':0}
         # Create a df based on assistant type
-        df = pd.read_csv('9_'+type_assistant+'.csv')
+        df = DBMana('9_'+type_assistant).csvToDf()
+        # pd.read_csv('9_'+type_assistant+'.csv')
         # Get a list of PersId in the table
         listPersId = df['PersId'].unique()
         # Parse all MEPs
@@ -442,7 +447,7 @@ def mepsStats():
             totalStats[type_assistant]['DaysAssistants'] += days.days
             # If line not alreay existing, create it
             if len(df_meps_stats.loc[(df_meps_stats['PersId'] == PersId)]) == 0:
-                dic_placeholder = {'Name':reference_mep['Name'].to_list()[0], 'EuParty': reference_mep['EuParty'].to_list()[0], 'NationalParty': reference_mep['NationalParty'].to_list()[0], 'EntryDate':reference_mep['EntryDate'].to_list()[0], 'LeaveDate':reference_mep['LeaveDate'].to_list()[0], 'PersId':PersId, 'accredited':0, 'accredited assistants (grouping)':0, 'local':0, 'local assistants (grouping)':0}
+                dic_placeholder = {'Name':reference_mep['Name'].to_list()[0], 'Country':reference_mep['Country'].to_list()[0], 'EuParty': reference_mep['EuParty'].to_list()[0], 'NationalParty': reference_mep['NationalParty'].to_list()[0], 'EntryDate':reference_mep['EntryDate'].to_list()[0], 'LeaveDate':reference_mep['LeaveDate'].to_list()[0], 'PersId':PersId, 'accredited':0, 'accredited assistants (grouping)':0, 'local':0, 'local assistants (grouping)':0}
                 # Add them to the dictionary
                 dic_placeholder[type_assistant] = number_assistants
                 # Add the average stay
@@ -465,11 +470,13 @@ def mepsStats():
         print(els, avg_days, avg_assistants)
     df_total = pd.DataFrame(df_total)
     df_total.fillna(0, inplace=True)
-    df_total.to_csv('total_stats.csv', index=False)
+    DBMana(data_name='total_stats', data=df_total).dfToCsv()
+    # df_total.to_csv('total_stats.csv', index=False)
 
     # Df to csv
     df_meps_stats.fillna(0, inplace=True)
-    df_meps_stats.to_csv('stats_meps.csv', index=False)
+    DBMana(data_name='stats_meps', data=df_meps_stats).dfToCsv()
+    # df_meps_stats.to_csv('stats_meps.csv', index=False)
 
 def scrap_assistants():
     print('DOWNLOADING...')
