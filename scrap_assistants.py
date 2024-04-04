@@ -8,6 +8,7 @@ from global_variables import origin_directory, testing_directory
 from datetime import datetime, timedelta
 import math
 from db_manager import DBMana
+import lzip
 
 file_extracted = 'meps_parltrack'
 url_download_parltrack_meps = 'https://parltrack.org/dumps/ep_meps.json.lz'
@@ -29,27 +30,18 @@ def extractPersId(list_meps):
     return listPersId
 
 def process_json_file(file_path, list_PersId=None):
-    count = 0
-
     list_current_term = []
     with open(origin_directory+file_path, 'r') as file:
-        for line in file:
-            stripped_line = line[1:].strip()           
-            if not stripped_line:
-                # End of JSON stream
-                break          
-            try:
-                json_data = json.loads(stripped_line)
-                # Update the last_record with the current record
-                last_record = json_data
-                if last_record['UserID'] in list_PersId:
-                    list_current_term.append(last_record)
-            except json.JSONDecodeError as e:
-                print(f"Error decoding JSON: {e}")          
-            count +=1
+        try:
+            json_data = json.load(file)
+            for els in json_data:
+                if els['UserID'] in list_PersId:
+                    list_current_term.append(els)
+        except OSError as e:
+            print(e)          
         # Get all current MEPs in JSON
         with open(origin_directory+json_data_file, 'w') as f:
-            f.write(json.dumps(list_current_term))               
+            f.write(json.dumps(list_current_term))             
 
 def getFullTermMepsPersId(list_meps):
     full_meps = []
@@ -404,7 +396,11 @@ def downloadAndExtract():
         open(origin_directory+file_extracted+'.lz', "wb").write(r.content)
     # Extract
     try:
-        os.system('lzip -d '+origin_directory+file_extracted+'.lz --output='+origin_directory+file_extracted+'.json')
+        buffer = lzip.decompress_file(origin_directory+file_extracted+'.lz')
+        decoded = buffer.decode('utf-8')
+        decoded = json.loads(decoded)
+        with open(origin_directory+file_extracted+'.json', 'w') as f:
+            f.write(json.dumps(decoded))
     except OSError as e:
         print(e)
 
