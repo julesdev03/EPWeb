@@ -3,6 +3,14 @@ from datetime import datetime, timedelta
 import math
 import json
 from scrap_assistants import testIfRemainingDate, list_type_assistant
+import lzip
+import requests
+
+file_extracted = 'meps_parltrack'
+url_download_parltrack_meps = 'https://parltrack.org/dumps/ep_meps.json.lz'
+default_entry_date = "2019-07-03"
+default_leave_date = "2024-07-02"
+json_data_file = 'meps_data.json'
 
 def mepsStats():
     # Total stats
@@ -72,6 +80,38 @@ def mepsStats():
     df_meps_stats.fillna(0, inplace=True)
     df_meps_stats.to_csv('stats_meps.csv', index=False)
 
-for el in list_type_assistant:
-    testIfRemainingDate(el)
-mepsStats()
+origin_directory = ''
+
+def process_json_file(file_path, list_PersId=None):
+    list_current_term = []
+    with open(origin_directory+file_path, 'r') as file:
+        try:
+            json_data = json.load(file)
+            for els in json_data:
+                if els['UserID'] in list_PersId:
+                    list_current_term.append(els)
+        except OSError as e:
+            print(e)          
+        # Get all current MEPs in JSON
+        with open(origin_directory+json_data_file, 'w') as f:
+            f.write(json.dumps(list_current_term))
+
+def downloadAndExtract():
+    # Download
+    r = requests.get(url_download_parltrack_meps)
+    if r.status_code == 200:
+        open(origin_directory+file_extracted+'.lz', "wb").write(r.content)
+    # Extract
+    try:
+        buffer = lzip.decompress_file(origin_directory+file_extracted+'.lz')
+        decoded = buffer.decode('utf-8')
+        decoded = json.loads(decoded)
+        with open(origin_directory+file_extracted+'.json', 'w') as f:
+            f.write(json.dumps(decoded))
+    except OSError as e:
+        print(e)
+
+downloadAndExtract()
+process_json_file(file_extracted+'.json', list_PersId=[124785])
+
+
