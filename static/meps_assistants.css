@@ -35,12 +35,17 @@ h1 {
 
 #table-div {
     width: 100%;
+    overflow-x: scroll;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
 
 #table-outcome {
-    width: fit-content; /* Set width to the widest content */
     border-collapse: collapse;
     overflow-x: auto;
+    width:100%;
+    max-width: 1500px;
 }
 
 table p {
