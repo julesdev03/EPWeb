@@ -3,6 +3,7 @@ from scrap_mep_class import Mep
 import requests
 import xml.etree.ElementTree as ET
 import os
+from global_variables import origin_directory
 
 political_parties = {
     "Group of the European People's Party (Christian Democrats)": "EPP",
@@ -62,24 +63,24 @@ class ScrapMep():
         # Process the incoming only to retain PersId and entry date
         self.incomingMepsProcess()
         # Delete the file
-        os.remove("incoming.xml")
+        os.remove(origin_directory+"incoming.xml")
 
         # Get the file
         self.downloadMepsFile(type='current')
         # Process the current meps
         self.currentMepsProcess()
         # Delete the file
-        os.remove("current.xml")
+        os.remove(origin_directory+"current.xml")
 
         # Get the file
         self.downloadMepsFile(type='outgoing')
         # Process outgoing meps
         self.outgoingMepsProcess()
         # Delete the file
-        os.remove("outgoing.xml")
+        os.remove(origin_directory+"outgoing.xml")
 
     def outgoingMepsProcess(self):
-        myroot = ET.parse('outgoing.xml').getroot()
+        myroot = ET.parse(origin_directory+'outgoing.xml').getroot()
         list_ = []
         # Get all meps and parse them
         for mep in myroot.findall('mep'):
@@ -101,7 +102,7 @@ class ScrapMep():
             self.list_meps.append(Mep(PersId=PersId, Name=Name, EuParty=EuParty, Country=Country, NationalParty=NationalParty, LeaveDate=LeaveDate, EntryDate=EntryDate))
 
     def incomingMepsProcess(self):
-        myroot = ET.parse('incoming.xml').getroot()
+        myroot = ET.parse(origin_directory+'incoming.xml').getroot()
         list_ = []
         # Get all meps and parse them
         for mep in myroot.findall('mep'):
@@ -115,7 +116,7 @@ class ScrapMep():
         self.incoming = list_
 
     def currentMepsProcess(self):
-        myroot = ET.parse('current.xml').getroot()
+        myroot = ET.parse(origin_directory+'current.xml').getroot()
         list_ = []
         # Get all meps and parse them
         for mep in myroot.findall('mep'):
@@ -154,7 +155,7 @@ class ScrapMep():
             r = requests.get(self.url_outgoing)
 
         if r.status_code == 200:
-            open(type+'.xml', "wb").write(r.content)
+            open(origin_directory+type+'.xml', "wb").write(r.content)
 
 
     def returnJsonMeps(self):
