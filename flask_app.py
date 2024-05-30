@@ -83,6 +83,18 @@ class archiveMEPs(db.Model):
     def renderAsDic(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
+class MEPsVote(db.Model):
+    __tablename__ = 'MEPsVote'
+    id = db.Column(db.Integer, primary_key=True)
+    PersId = db.Column(db.String(2000))
+    Vote = db.Column(db.String(2000))
+    MepId = db.Column(db.String(2000))
+    Identifier = db.Column(db.String(2000))
+    Corrected = db.Column(db.String(2000))
+
+    def renderAsDic(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
 # DBManagement
 
 def updateBasedOnId(data, table):
@@ -100,7 +112,6 @@ def updateBasedOnId(data, table):
 def addToDb(data, table):
     try:
         for addData in data:
-            # print(addData)
             stmt = (
                 insert(table).values({key:value for key, value in addData.items() if key !='id'})
             )
@@ -174,21 +185,26 @@ def graph():
 @app.route('/api/meps')
 def mepsAPI():
     args = request.args
-    mana = DBMana(data_name="meps")
+    # Check if there is a date, if yes return only MEPs that were present on that date
+    allMepsDb = MEPs().query.all()
+    allMepsDb = [i.renderAsDic() for i in allMepsDb]
     if args.get('date'):
-        input_date = args.get('date')
-        input_date = datetime.strptime(input_date, '%Y-%m-%d')
-        df1 = mana.csvToDf()
-        if 'EntryDate' in df1.columns and not pd.api.types.is_datetime64_any_dtype(df1['EntryDate']):
-            df1['EntryDate'] = pd.to_datetime(df1['EntryDate'])
-        if 'LeaveDate' in df1.columns and not pd.api.types.is_datetime64_any_dtype(df1['LeaveDate']):
-            df1['LeaveDate'] = pd.to_datetime(df1['LeaveDate'])
-        filtered_df = df1[(df1['EntryDate'] <= input_date) & (input_date <= df1['LeaveDate'])]
-        filtered_df = filtered_df.drop(columns=['EntryDate', 'LeaveDate'])
-        df = filtered_df.to_dict(orient='records')
-        return json.dumps(df)
+        date = datetime.strptime(args.get('date'), '%Y-%m-%d')
+        today = datetime.now()
+        toReturnMeps = []
+        for mep in allMepsDb:
+            Leave = mep['LeaveDate']
+            Entry = mep['EntryDate']
+            if mep['LeaveDate'] == 'ongoing' or '':
+                Leave = datetime.strftime(today, '%d-%m-%Y')
+            if mep['EntryDate'] == '':
+                Entry = '01-07-2019'
+            if datetime.strptime(Entry, '%d-%m-%Y') < date <= datetime.strptime(Leave, '%d-%m-%Y'):
+                toReturnMeps.append(mep)
+        return toReturnMeps
+    # Else return all MEPs
     else:
-        return mana.csvToJson()
+        return allMepsDb
 
 @app.route('/api/dates')
 def datesAPI():
@@ -333,8 +349,39 @@ def data_receiver():
                 updateBasedOnId(disappearedMeps, MEPs)      
             
             return jsonify({"DATA ADDED": "Data succesfully appended."}), 201
-
         
+        # Manage the votes
+        if data and data['Type']['main'] == 'MepsVotes':
+            listIdentifiers = [i['Identifier'] for i in data['Data']]
+            listVoteDb = MEPsVote().query.filter(MEPsVote.Identifier.in_(listIdentifiers)).all()
+            listVoteDb = [i.renderAsDic() for i in listVoteDb]
+            toAdd = []
+            toModify = []
+            for vote in data['Data']:
+            # Unroll data and check first if to be modified
+                correspondingVote = [i for i in listVoteDb if i['MepId'] == vote['MepId'] and i['Identifier'] == vote['Identifier']]
+                if len(correspondingVote) > 0:
+                    correspondingVote = correspondingVote[0]
+                    # Check if the new value is different from the original
+                    newData = {i:(correspondingVote[i] if i not in vote.keys() or vote[i] == '' or str(vote[i]) == str(correspondingVote[i]) else vote[i]) for i in correspondingVote}
+                    test = [i for i in newData if i in correspondingVote.keys() and str(newData[i]) != str(correspondingVote[i])]
+                    if len(test) > 0:
+                        toModify.append(newData)
+            # Else toAdd
+                else:
+                    toAdd.append(vote)
+            # Add to db
+            if len(toAdd) > 0:
+                print(len(toAdd))
+                addToDb(toAdd, MEPsVote)
+            if len(toModify) > 0:
+                updateBasedOnId(toModify, MEPsVote)
+            return jsonify({"DATA ADDED": "Data succesfully appended."}), 201
+        
+        return jsonify({"DATA INCORRECT": "Data structure should be incorrect."}), 501
+        
+
+            
 
     # If the key is not correct, returns access denied
     else:
