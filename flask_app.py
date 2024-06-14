@@ -109,17 +109,35 @@ def updateBasedOnId(data, table):
         db.session.rollback()
         print(e)
 
-def addToDb(data, table):
+def addToDb(data, table, batch_size=10000):
     try:
-        for addData in data:
-            stmt = (
-                insert(table).values({key:value for key, value in addData.items() if key !='id'})
-            )
-            db.session.execute(stmt)
-        db.session.commit()
+        for i in range(0, len(data), batch_size):
+            batch = data[i:i + batch_size]
+            db.session.bulk_insert_mappings(table, batch)
+            db.session.commit()
     except Exception as e:
         db.session.rollback()
         print(e)
+
+def retrieveData(table, conditions):
+    try:
+        query = db.session.query(table)
+        # Construct filters
+        filters = []
+        for column, values in conditions.items():
+            filters.append(getattr(table, column).in_(values))
+
+        # Query based on one or several filters
+        if len(filters) == 1:
+            q = query.filter(filters[0])
+        else:
+            q = query.filter(and_(*filters))
+        result = q.all()
+        resultList = [i.renderAsDic() for i in result]
+        return resultList
+    except Exception as e:
+        print(e)
+        return 'PROCESSING WENT WRONG'
 
 @app.route('/')
 def hello():
@@ -133,6 +151,38 @@ def MepsAssistants():
 @app.route('/check_vote')
 def checkVote():
     return render_template('check_vote.html')
+
+@app.route('/graph')
+def graph():
+    return render_template('graph_maker.html')
+
+@app.route('/assistants/mep/<int:PersId>')
+def assistantsMep(PersId):
+    origin = "9_"
+    # Get basic MEPs data
+    mana = DBMana('stats_meps')
+    data = mana.csvToJson()
+    data = json.loads(data)
+    for el in data:
+        if int(el['PersId']) == int(PersId):
+            mep = el
+            if mep['LeaveDate'] == '2024-07-02':
+                mep['LeaveDate'] = 'ongoing'
+    
+    # Get individual assistants
+    assistants_data = {'accredited':[], "local": [], "accredited assistants (grouping)":[], "local assistants (grouping)":[]}
+    for el in assistants_data.keys():
+        mana = DBMana(origin+el)
+        df = mana.csvToDf()
+        df = df[(df['PersId'] == int(PersId))]
+        dictionary = df.to_dict(orient='records')
+        for els in dictionary:
+            if els['LeaveDate'] == datetime.today().strftime('%Y-%m-%d'):
+                els['LeaveDate'] = 'ongoing'
+        assistants_data[el] = dictionary
+    return render_template('mep_APA.html', mep=mep, data=assistants_data)
+
+# API
 
 @app.route('/api/language')
 def languageAPI():
@@ -178,10 +228,6 @@ def imgMana():
             return send_file(img_buffer, mimetype='image/gif')
     return 'Enter a name'
 
-@app.route('/graph')
-def graph():
-    return render_template('graph_maker.html')
-
 @app.route('/api/meps')
 def mepsAPI():
     args = request.args
@@ -209,11 +255,12 @@ def mepsAPI():
 @app.route('/api/dates')
 def datesAPI():
     try:
-        mana = DBMana(data_name="dates")
-        return mana.csvToJson()
+        listDbDates = PlenaryDates().query.all()
+        listDbDates = [i.renderAsStr() for i in listDbDates]
+        return listDbDates
     except Exception as error:
         print(error)
-        return "Error"
+        return "Error when handling the data"
 
 @app.route('/api/list_countries')
 def countriesAPI():
@@ -230,31 +277,47 @@ def assistantsAPI():
         mana = DBMana(data_name="stats_meps")
         return mana.csvToJson()
 
-@app.route('/assistants/mep/<int:PersId>')
-def assistantsMep(PersId):
-    origin = "9_"
-    # Get basic MEPs data
-    mana = DBMana('stats_meps')
-    data = mana.csvToJson()
-    data = json.loads(data)
-    for el in data:
-        if int(el['PersId']) == int(PersId):
-            mep = el
-            if mep['LeaveDate'] == '2024-07-02':
-                mep['LeaveDate'] = 'ongoing'
-    
-    # Get individual assistants
-    assistants_data = {'accredited':[], "local": [], "accredited assistants (grouping)":[], "local assistants (grouping)":[]}
-    for el in assistants_data.keys():
-        mana = DBMana(origin+el)
-        df = mana.csvToDf()
-        df = df[(df['PersId'] == int(PersId))]
-        dictionary = df.to_dict(orient='records')
-        for els in dictionary:
-            if els['LeaveDate'] == datetime.today().strftime('%Y-%m-%d'):
-                els['LeaveDate'] = 'ongoing'
-        assistants_data[el] = dictionary
-    return render_template('mep_APA.html', mep=mep, data=assistants_data)
+@app.route('/api/votes_data')
+def votesAPI():
+    args = request.args
+    Identifier = args.get('Identifier')
+    MepId = args.get('MepId')
+    PersId = args.get('PersId')
+    conditions = {}
+    if Identifier:
+        conditions['Identifier'] = json.loads(Identifier)
+    if MepId:
+        conditions['MepId'] = json.loads(MepId)
+    if PersId:
+        conditions['PersId'] = json.loads(PersId)
+    if len(conditions) > 0:
+        print(conditions)
+        data = retrieveData(table=MEPsVote, conditions=conditions)
+        return data
+    return 'Something went wrong, check the arguments.'
+
+@app.route('/api/list_votes')
+def listvotesAPI():
+    args = request.args
+    Identifier = args.get('Identifier')
+    Date = args.get('Date')
+    FileNumber = args.get('FileNumber')
+    InterInst = args.get('InterNumber')
+    conditions = {}
+    if Identifier:
+        conditions['Identifier'] = json.loads(Identifier)
+    if Date:
+        conditions['Date'] = json.loads(Date)
+    if FileNumber:
+        conditions['FileNumber'] = json.loads(FileNumber)
+    if InterInst:
+        conditions['InterinstitutionalNumber'] = json.loads(InterInst)
+    if len(conditions) > 0:
+        data = retrieveData(table=ListVote, conditions=conditions)
+        return data
+    return 'Something went wrong, check the arguments.'
+
+# Data receiver
 
 @app.route('/saver', methods=['POST'])
 def data_receiver():
@@ -379,17 +442,13 @@ def data_receiver():
             return jsonify({"DATA ADDED": "Data succesfully appended."}), 201
         
         return jsonify({"DATA INCORRECT": "Data structure should be incorrect."}), 501
-        
-
-            
-
     # If the key is not correct, returns access denied
     else:
         abort(403)
 
-@app.route('/data_test')
+@app.route('/api/data_test')
 def data_test():
-    toCompare = ListVote().query.filter_by(Date=datetime.strptime('22-04-2024','%d-%m-%Y'))
+    toCompare = ListVote().query.filter_by(Date='22-04-2024')
     return [i.renderAsDic() for i in toCompare]
 
 if __name__ == '__main__':
